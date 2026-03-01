@@ -7,6 +7,10 @@ description: 'Manage haunted locations and investigation sites'
 
 Create a new haunted location record. Locations can be public (visible to the community) or private (visible only to the creator).
 
+<Warning>
+This endpoint validates input but does not persist data to the database yet. It currently returns a plain-text debug output.
+</Warning>
+
 ### Request Body
 
 <ParamField body="name" type="string" required>
@@ -211,6 +215,10 @@ data = response.json()
 ## GET /v1/locations/:id
 
 Retrieve a specific location by its ID.
+
+<Note>
+This endpoint currently returns mock/placeholder data for testing purposes. Database retrieval is not yet implemented.
+</Note>
 
 ### Path Parameters
 

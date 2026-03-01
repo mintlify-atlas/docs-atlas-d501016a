@@ -7,6 +7,10 @@ description: 'Manage paranormal evidence including photos, audio notes, and text
 
 Create a new evidence record with associated text notes, audio recordings, and photos from a paranormal investigation.
 
+<Warning>
+This endpoint is currently under development. The handler returns immediately and does not process or store evidence data yet.
+</Warning>
+
 ### Request Body
 
 <ParamField body="investigation_id" type="integer" required>
@@ -287,6 +291,10 @@ data = response.json()
 ## GET /v1/evidence/:id
 
 Retrieve a specific evidence record by its ID.
+
+<Warning>
+This endpoint is currently under development. The handler is commented out and does not return evidence data yet.
+</Warning>
 
 ### Path Parameters
 
