@@ -1,0 +1,79 @@
+{
+  "projectType": "saas",
+  "projectName": "Ghost Planet",
+  "projectDescription": "An all-in-one paranormal investigation platform to help newcomers get into the field",
+  "theme": "almond",
+  "primaryColor": "#6B4BA1",
+  "lightColor": "#9B7FCF",
+  "darkColor": "#4A2F7A",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Core Features",
+            "pages": [
+              "features/investigations",
+              "features/evidence",
+              "features/locations",
+              "features/visibility"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/recording-evidence",
+              "guides/managing-locations",
+              "guides/creating-investigations"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "api/overview",
+              "api/authentication"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api/investigations",
+              "api/evidence",
+              "api/locations",
+              "api/healthcheck"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Investigation management with location tracking and emergency contacts",
+    "Evidence collection including photos, audio notes, EVPs, and text notes",
+    "Location database with coordinates, lore, and popularity tracking",
+    "Public/private visibility controls for investigations and evidence",
+    "Community-contributed location database",
+    "Mobile and desktop evidence capture"
+  ],
+  "publicApiSurface": [
+    "POST /v1/investigations - Create new investigation",
+    "POST /v1/evidence - Submit evidence (photos, audio, text notes)",
+    "GET /v1/evidence/:id - Retrieve evidence by ID",
+    "POST /v1/locations - Create new location",
+    "GET /v1/locations/:id - Get location details",
+    "GET /v1/healthcheck - API health status"
+  ]
+}
