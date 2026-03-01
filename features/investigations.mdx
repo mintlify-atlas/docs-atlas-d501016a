@@ -1,0 +1,175 @@
+---
+title: 'Investigations'
+description: 'Plan, track, and document your paranormal investigations'
+---
+
+## Overview
+
+Investigations are the core feature of Ghost Planet that allow you to plan, execute, and document paranormal research sessions at haunted locations. Each investigation connects users, locations, and evidence into a comprehensive paranormal research session.
+
+## Investigation Structure
+
+Every investigation in Ghost Planet contains the following information:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | int64 | Unique identifier for the investigation |
+| `user_id` | int64 | The ID of the user conducting the investigation |
+| `location_id` | int64 | The ID of the location being investigated |
+| `phenomena` | string | Description of paranormal phenomena being investigated |
+| `created_at` | timestamp | When the investigation was created |
+| `evidence` | array | Collection of evidence gathered during the investigation |
+| `emergency_contact` | string | Emergency contact information for safety |
+| `visibility` | boolean | Public (true) or Private (false) investigation |
+
+<Note>
+  The `emergency_contact` field is a critical safety feature. Always provide a trusted contact who can check on you during investigations at remote or dangerous locations.
+</Note>
+
+## Creating an Investigation
+
+Follow these steps to plan and create a new investigation:
+
+<Steps>
+  <Step title="Select a Location">
+    Choose from the public location database or create a private location. The location provides coordinates, lore, and historical investigation data.
+  </Step>
+  
+  <Step title="Define the Phenomena">
+    Describe what paranormal activity you're investigating. This could be:
+    - Apparitions or shadow figures
+    - Electronic Voice Phenomena (EVP)
+    - Temperature anomalies
+    - Object manipulation
+    - Unexplained sounds or voices
+  </Step>
+  
+  <Step title="Set Safety Information">
+    Add an emergency contact who can check on you during the investigation. This is especially important for:
+    - Solo investigations
+    - Remote locations
+    - Investigations in abandoned buildings
+    - Overnight sessions
+  </Step>
+  
+  <Step title="Choose Visibility">
+    Decide whether this investigation should be:
+    - **Public**: Visible to the Ghost Planet community, contributing to location popularity and shared research
+    - **Private**: Only visible to you, ideal for preliminary research or sensitive locations
+  </Step>
+</Steps>
+
+## Investigation Workflows
+
+<Tabs>
+  <Tab title="Solo Investigation">
+    **Planning a solo investigation:**
+
+    1. Create the investigation with required emergency contact
+    2. Review location lore and past investigations from the community
+    3. Plan your evidence collection strategy
+    4. Conduct the investigation at the location
+    5. Upload evidence (photos, audio, notes) linked to the investigation
+    6. Set visibility to share findings with the community
+
+    <Warning>
+      Always inform your emergency contact of your exact location and expected return time.
+    </Warning>
+  </Tab>
+  
+  <Tab title="Team Investigation">
+    **Coordinating team investigations:**
+
+    1. Team lead creates the investigation
+    2. Share location coordinates and lore with team members
+    3. Each team member can contribute evidence to the same location
+    4. Evidence from multiple users builds a comprehensive investigation record
+    5. Public visibility shares collective findings with the community
+  </Tab>
+  
+  <Tab title="Location Research">
+    **Researching before investigating:**
+
+    Before creating an investigation, review:
+    - Location lore and historical background
+    - Past investigations by other users (if public)
+    - Location popularity rating (star system)
+    - Reported phenomena types
+    - Community-contributed evidence
+  </Tab>
+</Tabs>
+
+## Investigation Data Model
+
+The Investigation struct in the Ghost Planet backend:
+
+```go
+type Investigation struct {
+    ID               int64      `json:"id"`
+    UserID           int64      `json:"user,omitempty"`
+    LocationID       int64      `json:"location,omitempty"`
+    Phenomena        string     `json:"phenomena"`
+    CreatedAt        time.Time  `json:"created_at"`
+    Evidence         []Evidence `json:"evidence,omitempty"`
+    EmergencyContact string     `json:"emergency_contact"`
+    Visibility       bool       `json:"visibility"`
+}
+```
+
+## Linking Evidence to Investigations
+
+Evidence collection is deeply integrated with investigations:
+
+<Accordion title="How evidence connects to investigations">
+  Every piece of evidence (photos, audio notes, text notes, EVPs) contains an `investigation_id` field that links it to the parent investigation.
+
+  This creates a hierarchical structure:
+  ```
+  Investigation
+  ├── Location (where)
+  ├── User (who)
+  ├── Phenomena (what)
+  └── Evidence (proof)
+      ├── Photos
+      ├── Audio Notes
+      ├── Text Notes
+      └── EVPs
+  ```
+
+  All evidence uploaded during or after an investigation automatically references the investigation ID, allowing you to:
+  - View all evidence from a specific investigation session
+  - Track your research progress over time
+  - Share complete investigation packages with the community
+  - Build a portfolio of paranormal research
+</Accordion>
+
+## Best Practices
+
+<Tip>
+  **Maximize your investigation success:**
+  - Review past investigations at the location before visiting
+  - Document the phenomena you're targeting in detail
+  - Always include emergency contact information
+  - Start with private visibility, then make public after review
+  - Link all evidence to the investigation for complete documentation
+  - Update location lore with new discoveries
+</Tip>
+
+## Investigation Visibility
+
+Visibility controls determine who can see your investigation:
+
+| Setting | Who Can See | Use Case |
+|---------|-------------|----------|
+| Public (`true`) | All Ghost Planet users | Share findings, contribute to location popularity, build community knowledge |
+| Private (`false`) | Only you | Preliminary research, sensitive locations, personal documentation |
+
+<Info>
+  Public investigations contribute to location popularity ratings and help other investigators plan their research. Consider making investigations public after you've reviewed and organized your evidence.
+</Info>
+
+## Related Features
+
+- [Evidence Collection](/features/evidence) - Document your findings
+- [Location Database](/features/locations) - Find haunted locations
+- [Visibility Controls](/features/visibility) - Manage privacy settings

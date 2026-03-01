@@ -1,0 +1,342 @@
+---
+title: 'Location Database'
+description: 'Discover haunted locations with coordinates, lore, and community popularity ratings'
+---
+
+## Overview
+
+The Location Database is Ghost Planet's comprehensive catalog of haunted and paranormal locations. Each location includes geographic coordinates, historical lore, past investigation data, and community popularity ratings.
+
+## Location Structure
+
+Every location in Ghost Planet contains detailed information:
+
+```go
+type Location struct {
+    ID                          int64           `json:"id"`
+    Name                        string          `json:"name"`
+    Address                     string          `json:"address"`
+    State                       string          `json:"state"`
+    City                        string          `json:"city"`
+    Zip                         string          `json:"zip"`
+    Lore                        string          `json:"lore"`
+    Latitude                    float64         `json:"latitude"`
+    Longitude                   float64         `json:"longitude"`
+    PastInvestigationsUser      []Investigation `json:"past_investigations_user"`
+    PastInvestigationsCommunity []Investigation `json:"past_investigations_community"`
+    Popularity                  Popularity      `json:"popularity"`
+    Visibility                  bool            `json:"visibility"`
+    CreatedByUserID             int64           `json:"created_by_user_id"`
+    OwnerUserID                 int64           `json:"owner_user_id"`
+}
+```
+
+## Location Fields
+
+<Accordion title="Geographic Information">
+  **Address Components:**
+  - `name`: Location name (max 500 bytes)
+  - `address`: Full street address
+  - `city`: City name
+  - `state`: State (dropdown selection)
+  - `zip`: Postal code
+
+  **Coordinates:**
+  - `latitude`: -90 to 90 degrees
+  - `longitude`: -180 to 180 degrees
+
+  <Note>
+    Coordinates must be valid numbers within geographic bounds. The system validates that latitude and longitude values are not NaN (Not a Number) or infinite.
+  </Note>
+</Accordion>
+
+<Accordion title="Paranormal Information">
+  **Lore:**
+  
+  The `lore` field stores the location's paranormal history and reported phenomena (max 500 bytes):
+  - Historical background
+  - Reported hauntings and manifestations
+  - Notable events or tragedies
+  - Local legends and folklore
+  - Documented paranormal activity
+
+  Example:
+  ```json
+  {
+    "name": "Haunted Manor",
+    "lore": "Local legend says a woman in white roams the halls every full moon. Multiple witnesses have reported footsteps on the second floor when the building is empty."
+  }
+  ```
+</Accordion>
+
+<Accordion title="Investigation History">
+  Ghost Planet tracks two types of investigation history:
+
+  **Your Investigations:**
+  - `past_investigations_user`: All investigations YOU conducted at this location
+  - Personal research history
+  - Your collected evidence
+  - Your notes and findings
+
+  **Community Investigations:**
+  - `past_investigations_community`: Public investigations by all users
+  - Shared research data
+  - Community-contributed evidence
+  - Collective knowledge base
+
+  <Info>
+    Review past investigations before visiting a location to learn from others' experiences and plan your research strategy.
+  </Info>
+</Accordion>
+
+## Creating a Location
+
+<Steps>
+  <Step title="Enter Basic Information">
+    Provide the location name and complete address:
+    - Name (required, max 500 bytes)
+    - Street address (required)
+    - City, State, ZIP
+  </Step>
+  
+  <Step title="Add Coordinates">
+    Enter precise geographic coordinates:
+    - Latitude: -90 to 90
+    - Longitude: -180 to 180
+    
+    <Tip>
+      Use mapping services like Google Maps to find accurate coordinates. Right-click on a location and select the coordinates to copy them.
+    </Tip>
+  </Step>
+  
+  <Step title="Document the Lore">
+    Write the location's paranormal history (max 500 bytes):
+    - Historical context
+    - Reported phenomena types
+    - Notable incidents
+    - Local legends
+  </Step>
+  
+  <Step title="Set Visibility">
+    Choose location visibility:
+    - **Public**: Visible to all users, contributes to community database
+    - **Private**: Only visible to you, for personal research
+  </Step>
+</Steps>
+
+## Location Validation
+
+Ghost Planet enforces strict validation to ensure data quality:
+
+```go
+func ValidateLocation(v *validator.Validator, location *Location) {
+    // Name validation
+    v.Check(location.Name != "", "name", "must be provided")
+    v.Check(len(location.Name) <= 500, "name", "must not be more than 500 bytes long")
+
+    // Address validation
+    v.Check(location.Address != "", "address", "must be provided")
+
+    // Lore validation
+    v.Check(location.Lore != "", "lore", "must be provided")
+    v.Check(len(location.Lore) <= 500, "lore", "must not be more than 500 bytes long")
+
+    // Coordinate validation
+    v.Check(!math.IsNaN(location.Latitude), "latitude", "must be a valid number")
+    v.Check(!math.IsInf(location.Latitude, 0), "latitude", "must be a finite number")
+    v.Check(location.Latitude > -90 && location.Latitude < 90, "latitude", 
+            "must be between -90 and 90")
+
+    v.Check(!math.IsNaN(location.Longitude), "longitude", "must be a valid number")
+    v.Check(!math.IsInf(location.Longitude, 0), "longitude", "must be a finite number")
+    v.Check(location.Longitude > -180 && location.Longitude < 180, "longitude", 
+            "must be between -180 and 180")
+}
+```
+
+<Warning>
+  All required fields must be provided and within specified limits. Invalid coordinates will be rejected to ensure accurate mapping.
+</Warning>
+
+## Popularity System
+
+Locations are rated using a star-based popularity system:
+
+```go
+type Popularity int32
+
+func (p Popularity) MarshalJSON() ([]byte, error) {
+    jsonValue := fmt.Sprintf("%d stars", p)
+    quotedJSONValue := strconv.Quote(jsonValue)
+    return []byte(quotedJSONValue), nil
+}
+```
+
+### How Popularity Works
+
+<Tabs>
+  <Tab title="Rating Display">
+    Popularity is displayed as a star rating:
+    
+    ```json
+    {
+      "name": "Haunted Manor",
+      "popularity": "42 stars"
+    }
+    ```
+    
+    The star count increases based on:
+    - Number of public investigations
+    - Amount of evidence contributed
+    - Community engagement
+    - Historical significance
+  </Tab>
+  
+  <Tab title="Finding Popular Locations">
+    High-popularity locations indicate:
+    - Well-documented paranormal activity
+    - Multiple independent confirmations
+    - Active community research
+    - Rich investigation history
+    
+    Use popularity to prioritize locations for investigation.
+  </Tab>
+  
+  <Tab title="Contributing to Popularity">
+    Increase a location's popularity by:
+    - Creating public investigations
+    - Uploading evidence (photos, audio, EVPs)
+    - Adding detailed text notes
+    - Updating location lore with new findings
+    
+    <Note>
+      Only public investigations contribute to location popularity. Private investigations don't affect the rating.
+    </Note>
+  </Tab>
+</Tabs>
+
+## Public vs. Private Locations
+
+The `visibility` field controls location access:
+
+| Visibility | Value | Who Can See | Use Case |
+|------------|-------|-------------|----------|
+| **Public** | `true` | All Ghost Planet users | Contribute to community database, share discoveries, build collective knowledge |
+| **Private** | `false` | Only you (owner) | Personal research spots, sensitive locations, preliminary documentation |
+
+### Location Ownership
+
+Two ownership fields track location creation and control:
+
+```go
+CreatedByUserID int64  // Who first added the location
+OwnerUserID     int64  // Who controls visibility and updates
+```
+
+<Info>
+  The creator may transfer ownership or maintain control. Only the owner can change visibility settings or edit location details.
+</Info>
+
+## Investigation Planning
+
+Use location data to plan effective investigations:
+
+<Steps>
+  <Step title="Search the Database">
+    Find locations by:
+    - Geographic area (city, state)
+    - Popularity rating
+    - Phenomena type (from lore)
+    - Investigation history
+  </Step>
+  
+  <Step title="Review Location Details">
+    Study the location before visiting:
+    - Read the lore to understand reported phenomena
+    - Review past investigations (yours and community)
+    - Check popularity as an indicator of activity level
+    - Note the exact coordinates for navigation
+  </Step>
+  
+  <Step title="Analyze Past Evidence">
+    Learn from previous investigations:
+    - Review photos from other investigators
+    - Listen to EVPs captured at the location
+    - Read text notes documenting phenomena
+    - Identify patterns in reported activity
+  </Step>
+  
+  <Step title="Plan Your Approach">
+    Design your investigation based on location data:
+    - Target specific areas mentioned in past investigations
+    - Bring equipment suited to reported phenomena
+    - Schedule during times when activity was previously reported
+    - Prepare questions based on location lore
+  </Step>
+</Steps>
+
+## Community Contributions
+
+Public locations build a collective knowledge base:
+
+<Accordion title="Contributing to Community Locations">
+  When you make a location public, you enable:
+  
+  **Collaborative Research:**
+  - Multiple investigators document the same location
+  - Evidence accumulates from different perspectives
+  - Patterns emerge from repeated investigations
+  - Community validates or debunks claims
+
+  **Shared Resources:**
+  - Your lore documentation helps others prepare
+  - Your coordinates guide future investigators
+  - Your evidence contributes to location history
+  - Your findings increase location visibility
+
+  **Knowledge Growth:**
+  - Community adds new phenomena to lore
+  - Investigation history expands over time
+  - Popularity reflects research value
+  - Best practices emerge from collective experience
+
+  <Tip>
+    Consider making locations public after your initial investigation to contribute to the paranormal research community.
+  </Tip>
+</Accordion>
+
+## Example Location
+
+A complete location record:
+
+```json
+{
+  "id": 1,
+  "name": "Haunted Manor",
+  "address": "123 Spooky St",
+  "city": "Albuquerque",
+  "state": "NM",
+  "zip": "08712",
+  "lore": "Local legend says a woman in white roams the halls every full moon",
+  "latitude": 40.7128,
+  "longitude": -74.0060,
+  "past_investigations_user": [],
+  "past_investigations_community": [
+    {
+      "id": 42,
+      "phenomena": "Apparition sightings",
+      "created_at": "2025-10-15T22:30:00Z"
+    }
+  ],
+  "popularity": "42 stars",
+  "visibility": true,
+  "created_by_user_id": 100,
+  "owner_user_id": 100
+}
+```
+
+## Related Features
+
+- [Investigations](/features/investigations) - Create investigation sessions at locations
+- [Evidence Collection](/features/evidence) - Document findings at locations
+- [Visibility Controls](/features/visibility) - Manage location privacy

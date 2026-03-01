@@ -1,80 +1,389 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Get started with Ghost Planet in minutes and conduct your first paranormal investigation
 ---
 
-## Get started in three steps
+## Create your account
 
-Get your documentation site running locally and make your first customization.
+Ghost Planet requires a user account to create investigations and store evidence.
 
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+<Steps>
+  <Step title="Sign up">
+    Register with your basic information:
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    - First name and last name (kept private)
+    - Public username (visible to community)
+    - Profile settings and preferences
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    <Note>
+    Your real name is never shared publicly. Only your username is visible to other users.
+    </Note>
+  </Step>
+  
+  <Step title="Set your status">
+    Choose your visibility status:
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    - **Online**: Available for community interaction
+    - **Offline**: Not currently active
+    - **Idle**: Away from the platform
+  </Step>
+  
+  <Step title="Complete your profile">
+    Add optional details to enhance your profile:
+    
+    - Profile page URL
+    - Bio and interests
+    - Investigation preferences
+  </Step>
+</Steps>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+## Choose your mode
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+Ghost Planet offers two modes optimized for different investigation phases:
 
-### Step 3: Go live
+<CardGroup cols={2}>
+  <Card title="Mobile mode" icon="mobile">
+    **Best for field investigations**
+    
+    - Live photo/video capture
+    - Audio recording for notes and EVPs
+    - Quick text evidence entry
+    - Location tracking
+  </Card>
+  
+  <Card title="Desktop mode" icon="desktop">
+    **Best for evidence management**
+    
+    - File uploads and organization
+    - Map-based location browser
+    - Investigation review and editing
+    - Community location discovery
+  </Card>
+</CardGroup>
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+<Tip>
+Start with desktop mode to explore locations and plan your investigation, then switch to mobile mode when you're in the field.
+</Tip>
+
+## Your first investigation
+
+### Step 1: Create or select a location
+
+Every investigation needs a location. You can either choose an existing community location or create your own.
+
+<Tabs>
+  <Tab title="Use existing location">
+    Browse the community location database:
+    
+    1. Navigate to the Mappy interface in desktop mode
+    2. Browse the map or search by name
+    3. Click on location markers to view details:
+       - Location name and address
+       - Historical lore
+       - Past investigations
+       - Popularity metrics
+    4. Select a location for your investigation
+    
+    <Info>
+    Public locations are contributed by verified community members and include rich historical context.
+    </Info>
+  </Tab>
+  
+  <Tab title="Create new location">
+    Create a custom location for private or future public use:
+    
+    **Required fields:**
+    ```json
+    {
+      "name": "Abandoned Mill House",
+      "address": "456 River Road, Salem, MA 01970",
+      "lore": "Built in 1847, locals report seeing a woman in Victorian dress near the water wheel",
+      "latitude": 42.5195,
+      "longitude": -70.8967,
+      "visibility": false
+    }
+    ```
+    
+    **Coordinate tips:**
+    - Use Google Maps or GPS device for accurate coordinates
+    - Latitude range: -90 to 90
+    - Longitude range: -180 to 180
+    
+    **Visibility options:**
+    - `false` (private): Only you can see this location
+    - `true` (public): Shared with community (requires verification status)
+    
+    <Warning>
+    Ensure you have permission to investigate private properties. Never trespass.
+    </Warning>
+  </Tab>
+</Tabs>
+
+### Step 2: Start your investigation
+
+With a location selected, create your investigation:
+
+<Steps>
+  <Step title="Fill out investigation details">
+    Provide essential information:
+    
+    ```json
+    {
+      "location_id": 123,
+      "phenomena": "Reports of unexplained footsteps and temperature fluctuations in second floor hallway",
+      "emergency_contact": "+1-555-0123",
+      "visibility": true
+    }
+    ```
+    
+    **Fields explained:**
+    - `location_id`: Links to your chosen location
+    - `phenomena`: What you're investigating
+    - `emergency_contact`: Safety contact (highly recommended)
+    - `visibility`: Public (true) or private (false)
+    
+    <Tip>
+    Be specific about phenomena to help you stay focused and provide context for evidence review.
+    </Tip>
+  </Step>
+  
+  <Step title="Add emergency contact">
+    Always include an emergency contact when investigating:
+    
+    - Friend or family member aware of your location
+    - Expected return time communicated
+    - Contact should have address/coordinates
+    
+    <Warning>
+    Never investigate alone, especially in abandoned or remote locations. Your safety is the top priority.
+    </Warning>
+  </Step>
+  
+  <Step title="Choose visibility">
+    Decide if your investigation will be shared:
+    
+    **Private investigations:**
+    - Only visible to you
+    - Perfect for preliminary investigations
+    - Can be made public later
+    
+    **Public investigations:**
+    - Visible to community
+    - Contributes to location history
+    - Helps other investigators
+  </Step>
+</Steps>
+
+### Step 3: Collect evidence
+
+Once your investigation is created, start gathering evidence:
+
+<Tabs>
+  <Tab title="Text notes">
+    Document observations in real-time:
+    
+    ```jsx
+    <form>
+      <input 
+        type="text" 
+        id="subject" 
+        placeholder="Cold spot in master bedroom" 
+      />
+      <textarea 
+        id="body" 
+        name="body" 
+        rows="5" 
+        cols="33"
+        placeholder="Temperature dropped approximately 15 degrees..."
+      />
+      <select name="locations" id="location-select">
+        <option value="123">Abandoned Mill House</option>
+      </select>
+      <input type="button" value="Submit"/>
+    </form>
+    ```
+    
+    **Best practices:**
+    - Include timestamps in your notes
+    - Note environmental conditions (weather, time of day)
+    - Record equipment settings
+    - Document baseline readings
+    
+    **Validation:**
+    - Subject: Required, max 500 characters
+    - Body: Required, max 10,000 characters
+  </Tab>
+  
+  <Tab title="Photos">
+    Capture visual evidence:
+    
+    **Mobile mode:**
+    - Use in-app camera for instant capture
+    - Photos automatically linked to current investigation
+    - Add captions immediately
+    
+    **Desktop mode:**
+    - Upload existing photos
+    - Bulk upload supported
+    - Webcam capture for investigator documentation
+    
+    **Requirements:**
+    - Formats: JPEG, JPG, PNG, WebP
+    - Max size: 5 MB per file
+    - Caption required (max 500 characters)
+    
+    ```json
+    {
+      "evidence_id": 42,
+      "source_url": "https://storage.ghostplanet.com/photos/123456.jpg",
+      "caption": "Orb visible in upper left corner near ceiling",
+      "file_type": "jpeg",
+      "file_size_bytes": 2457600
+    }
+    ```
+    
+    <Info>
+    Thumbnails are automatically generated for faster browsing and reduced bandwidth usage.
+    </Info>
+  </Tab>
+  
+  <Tab title="Audio recordings">
+    Record sounds, notes, and potential EVPs:
+    
+    **Mobile mode:**
+    - Use device microphone for field recordings
+    - Mark recordings as EVP candidates
+    - Add titles for organization
+    
+    **Desktop mode:**
+    - Upload audio files from recording devices
+    - Review and classify recordings
+    - Add detailed metadata
+    
+    **Requirements:**
+    - Max size: 5 MB per file
+    - Title/description required
+    - Duration automatically calculated
+    
+    ```json
+    {
+      "evidence_id": 42,
+      "title": "EVP Session 1 - Master Bedroom",
+      "source_url": "https://storage.ghostplanet.com/audio/789012.mp3",
+      "duration": "00:05:23",
+      "file_size_bytes": 3221225,
+      "is_evp": true
+    }
+    ```
+    
+    **EVP flag:**
+    - Set `is_evp: true` for potential Electronic Voice Phenomena
+    - Set `is_evp: false` for investigator notes or ambient recordings
+    
+    <Tip>
+    Record a baseline audio sample before starting EVP sessions to compare environmental noise levels.
+    </Tip>
+  </Tab>
+</Tabs>
+
+## View your evidence
+
+Access all your collected evidence through the Evidence page:
+
+```jsx
+<EvidenceList />
+```
+
+Evidence is displayed in a table with:
+- Evidence ID
+- Creation timestamp
+- Text notes preview
+- Audio notes count
+- Photos count
+- EVPs count
+- Visibility status
+
+<Info>
+Evidence visibility inherits from the parent investigation. Private investigations keep all evidence private.
+</Info>
+
+## Understanding the data structure
+
+Ghost Planet uses a relational structure to connect your investigations:
+
+```
+User
+  └── Investigations
+        ├── Location
+        │     ├── Coordinates (lat/long)
+        │     ├── Address
+        │     └── Lore
+        └── Evidence
+              ├── Text Notes
+              ├── Audio Notes (EVPs)
+              └── Photos
+```
+
+**Key relationships:**
+- Each investigation belongs to one user and one location
+- Each piece of evidence belongs to one investigation
+- Locations can have many investigations from multiple users
+- Evidence visibility is controlled at the investigation level
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Recording evidence" icon="microscope" href="/guides/recording-evidence">
+    Learn best practices for capturing and documenting paranormal evidence
+  </Card>
+  
+  <Card title="Managing locations" icon="map" href="/guides/managing-locations">
+    Master the location database and contribute to the community
+  </Card>
+  
+  <Card title="API reference" icon="code" href="/api/overview">
+    Integrate with the Ghost Planet REST API
+  </Card>
+  
+  <Card title="Core features" icon="star" href="/features/investigations">
+    Explore investigations, evidence, and location features
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Getting help
+
+If you encounter issues or have questions:
+
+<Steps>
+  <Step title="Check validation errors">
+    Ghost Planet provides detailed validation feedback:
+    
+    - Field requirements (character limits)
+    - Data format errors (coordinates, file types)
+    - Missing required fields
+  </Step>
+  
+  <Step title="Review community forums">
+    Connect with other investigators:
+    
+    - Share experiences
+    - Ask for advice
+    - Learn from the community
+    
+    <Note>
+    Forum posts support custom signatures and are timestamped for reference.
+    </Note>
+  </Step>
+  
+  <Step title="Report issues">
+    Found a bug or have a feature request?
+    
+    - Submit detailed reports through the platform
+    - Include screenshots when possible
+    - Describe expected vs. actual behavior
+  </Step>
+</Steps>
+
+<Info>
+Ghost Planet is actively developed. Your feedback helps shape the platform's future.
+</Info>

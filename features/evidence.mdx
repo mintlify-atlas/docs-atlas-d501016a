@@ -1,0 +1,295 @@
+---
+title: 'Evidence Collection'
+description: 'Capture and organize paranormal evidence with photos, audio, text notes, and EVPs'
+---
+
+## Overview
+
+Evidence collection is the backbone of paranormal research on Ghost Planet. The platform supports four types of evidence to document your investigations: photos, audio recordings, text notes, and Electronic Voice Phenomena (EVPs).
+
+## Evidence Types
+
+Ghost Planet organizes evidence into a parent Evidence record with associated media items:
+
+```go
+type Evidence struct {
+    ID              int64     `json:"id"`
+    InvestigationID int64     `json:"investigation_id"`
+    LocationID      int64     `json:"location_id"`
+    CreatedByUserID int64     `json:"created_by_user_id"`
+    CreatedAt       time.Time `json:"created_at"`
+    Visibility      bool      `json:"visibility"`
+    Version         int32     `json:"version"`
+}
+```
+
+<Info>
+  Each evidence item is linked to both an investigation and a location, allowing you to organize evidence by research session or by location.
+</Info>
+
+## Photo Evidence
+
+Capture visual paranormal phenomena with photo evidence.
+
+### Photo Structure
+
+```go
+type Photo struct {
+    ID            int64     `json:"id"`
+    EvidenceID    int64     `json:"evidence_id"`
+    SourceURL     string    `json:"source_url"`
+    ThumbnailURL  string    `json:"thumbnail_url"`
+    Caption       string    `json:"caption"`
+    FileType      string    `json:"file_type"`
+    FileSizeBytes int64     `json:"file_size_bytes"`
+    CreatedAt     time.Time `json:"created_at"`
+}
+```
+
+### Photo Requirements
+
+| Field | Requirement | Validation |
+|-------|-------------|------------|
+| **Source URL** | Required | Max 2000 bytes |
+| **File Type** | Required | jpeg, jpg, png, webp |
+| **File Size** | Required | 1 byte to 5 MB |
+| **Caption** | Required | Max 500 bytes |
+| **Thumbnail** | Auto-generated | System creates optimized thumbnail |
+
+<Steps>
+  <Step title="Capture the Photo">
+    Take photos during your investigation of:
+    - Orbs or light anomalies
+    - Shadow figures or apparitions
+    - Environmental changes (fog, mist)
+    - Equipment readings (EMF meters, temperature)
+  </Step>
+  
+  <Step title="Upload to Ghost Planet">
+    Upload photos with supported formats: JPEG, JPG, PNG, or WebP
+    
+    Maximum file size: **5 MB per photo**
+  </Step>
+  
+  <Step title="Add Context">
+    Write a descriptive caption explaining:
+    - What the photo shows
+    - When it was taken during the investigation
+    - Equipment settings used
+    - Environmental conditions
+  </Step>
+  
+  <Step title="Link to Investigation">
+    Connect the photo to your investigation for organized evidence tracking.
+  </Step>
+</Steps>
+
+<Warning>
+  Photos larger than 5 MB will be rejected. Compress high-resolution images before uploading.
+</Warning>
+
+## Audio Evidence
+
+Record ambient sounds, investigator notes, and potential paranormal audio during investigations.
+
+### Audio Structure
+
+```go
+type AudioNote struct {
+    ID            int64         `json:"id"`
+    EvidenceID    int64         `json:"evidence_id"`
+    Title         string        `json:"title"`
+    SourceURL     string        `json:"source_url"`
+    Duration      time.Duration `json:"duration"`
+    FileSizeBytes int64         `json:"file_size_bytes"`
+    IsEVP         bool          `json:"is_evp"`
+    CreatedAt     time.Time     `json:"created_at"`
+}
+```
+
+### Audio Requirements
+
+| Field | Requirement | Validation |
+|-------|-------------|------------|
+| **Source URL** | Required | Max 2000 bytes |
+| **File Size** | Required | 1 byte to 5 MB |
+| **Title** | Optional | Describe the recording |
+| **Duration** | Auto-detected | System extracts from file |
+| **Is EVP** | User-specified | Mark as Electronic Voice Phenomena |
+
+<Accordion title="What is an EVP?">
+  **Electronic Voice Phenomena (EVP)** are sounds found on electronic recordings that resemble speech, but are not the result of intentional recording or known sources.
+
+  EVPs are often:
+  - Discovered during playback review
+  - Not heard during the live investigation
+  - Analyzed with audio software for clarity
+  - Categorized by quality (Class A, B, C)
+
+  Mark audio as EVP using the `is_evp` flag to separate potential paranormal audio from regular investigation recordings.
+</Accordion>
+
+### Recording Best Practices
+
+<Tip>
+  **Capture high-quality audio evidence:**
+  - Use external microphones for better sensitivity
+  - Record in WAV or high-bitrate MP3 for clarity
+  - Note exact time and location of recordings
+  - Include control recordings (background noise baseline)
+  - Mark potential EVPs for later analysis
+  - Keep file sizes under 5 MB (compress if needed)
+</Tip>
+
+## Text Notes
+
+Document observations, environmental conditions, and investigation progress with detailed text notes.
+
+### Text Note Structure
+
+```go
+type TextNote struct {
+    ID         int64     `json:"id"`
+    EvidenceID int64     `json:"evidence_id"`
+    Subject    string    `json:"subject"`
+    Body       string    `json:"body"`
+    LocationID int64     `json:"location_id"`
+    CreatedAt  time.Time `json:"created_at"`
+}
+```
+
+### Text Note Requirements
+
+| Field | Requirement | Validation |
+|-------|-------------|------------|
+| **Subject** | Required | Max 500 bytes |
+| **Body** | Required | Max 10,000 bytes |
+| **Location ID** | Optional | Links note to specific location |
+
+### What to Document
+
+<Tabs>
+  <Tab title="Environmental Data">
+    Record baseline and anomalous conditions:
+    - Temperature readings
+    - Humidity levels
+    - Barometric pressure
+    - EMF (Electromagnetic Field) readings
+    - Time of day and moon phase
+    - Weather conditions
+  </Tab>
+  
+  <Tab title="Observations">
+    Document experiences and phenomena:
+    - Visual sightings (apparitions, shadows, orbs)
+    - Auditory experiences (voices, footsteps, knocks)
+    - Physical sensations (cold spots, touch, pressure)
+    - Equipment behavior (battery drain, malfunctions)
+    - Emotional impressions
+  </Tab>
+  
+  <Tab title="Investigation Log">
+    Create a timeline of your investigation:
+    - Arrival and setup time
+    - Team member assignments
+    - Location areas investigated
+    - Equipment used in each area
+    - Breaks and equipment checks
+    - Notable events with timestamps
+    - Departure and wrap-up
+  </Tab>
+</Tabs>
+
+<Note>
+  Text notes support up to 10,000 bytes in the body field, allowing for detailed documentation. Use the subject line to categorize notes (e.g., "Temperature Anomaly - 2nd Floor", "EVP Session - Basement").
+</Note>
+
+## Evidence Workflow
+
+The complete evidence collection process:
+
+<Steps>
+  <Step title="Create Investigation">
+    Start by creating an investigation at your chosen location.
+  </Step>
+  
+  <Step title="Gather Evidence">
+    During the investigation, collect:
+    - Photos of anomalies or equipment readings
+    - Audio recordings of the environment and potential EVPs
+    - Text notes documenting observations and conditions
+  </Step>
+  
+  <Step title="Upload and Organize">
+    After the investigation:
+    - Upload photos with descriptive captions
+    - Upload audio files, marking EVPs separately
+    - Create text notes summarizing findings
+    - Link all evidence to the investigation ID
+  </Step>
+  
+  <Step title="Review and Analyze">
+    Review uploaded evidence:
+    - Analyze audio for EVPs
+    - Enhance photos for clarity
+    - Cross-reference timestamps across evidence types
+    - Update text notes with analysis results
+  </Step>
+  
+  <Step title="Set Visibility">
+    Choose to keep evidence private or share with the community.
+  </Step>
+</Steps>
+
+## Evidence Synchronization
+
+Ghost Planet uses a transactional sync system to ensure data integrity:
+
+```go
+func (e EvidenceModel) FullSync(evidence *Evidence, 
+                                 audioNotes []AudioNote, 
+                                 textNotes []TextNote, 
+                                 photos []Photo) error
+```
+
+This `FullSync` method:
+- Creates the parent Evidence record
+- Inserts all associated photos, audio, and text notes
+- Uses database transactions for atomic operations
+- Rolls back on any failure to maintain data consistency
+
+<Info>
+  The atomic transaction ensures that all evidence types are saved together. If any upload fails, the entire evidence package is rolled back, preventing partial data loss.
+</Info>
+
+## File Size Limits
+
+All media files have a maximum size of **5 MB**:
+
+| Evidence Type | Max Size | Recommended Format |
+|---------------|----------|--------------------|
+| Photos | 5 MB | JPEG, PNG (compressed) |
+| Audio | 5 MB | MP3 (192kbps or lower) |
+| Text Notes | 10,000 bytes | Plain text |
+
+<Warning>
+  Files exceeding 5 MB will be rejected during upload. Use compression tools to reduce file sizes while maintaining quality:
+  - **Photos**: Use JPEG with 80-90% quality
+  - **Audio**: Use MP3 with 128-192 kbps bitrate
+</Warning>
+
+## Evidence Versioning
+
+The Evidence model includes a `version` field for optimistic locking:
+
+```go
+Version int32 `json:"version"`
+```
+
+This prevents concurrent update conflicts when multiple users contribute evidence to the same investigation.
+
+## Related Features
+
+- [Investigations](/features/investigations) - Plan and track research sessions
+- [Locations](/features/locations) - Link evidence to locations
+- [Visibility Controls](/features/visibility) - Control evidence privacy

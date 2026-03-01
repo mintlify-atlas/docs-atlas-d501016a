@@ -1,0 +1,197 @@
+---
+title: 'Authentication'
+description: 'API authentication methods and security considerations'
+---
+
+## Current State
+
+<Warning>
+  The Ghost Planet API currently does **not implement authentication**. All endpoints are publicly accessible without requiring credentials.
+</Warning>
+
+The API is in active development, and authentication will be added in future versions. This page documents the current state and planned authentication strategy.
+
+## Public Endpoints
+
+All current endpoints are publicly accessible:
+
+- `GET /v1/healthcheck` - API health status
+- `POST /v1/investigations` - Create investigation
+- `POST /v1/evidence` - Create evidence
+- `GET /v1/evidence/:id` - Get evidence by ID
+- `POST /v1/locations` - Create location
+- `GET /v1/locations/:id` - Get location by ID
+
+Source: `backend/cmd/api/routes.go:9-29`
+
+## Making Requests
+
+Since authentication is not currently implemented, you can make requests directly without any authentication headers:
+
+<CodeGroup>
+
+```bash Health Check
+curl http://localhost:4000/v1/healthcheck
+```
+
+```bash Get Location
+curl http://localhost:4000/v1/locations/1
+```
+
+```bash Create Location
+curl -X POST http://localhost:4000/v1/locations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Old Asylum",
+    "address": "789 Forgotten Rd",
+    "lore": "Built in 1890, known for mysterious footsteps",
+    "latitude": 40.7589,
+    "longitude": -73.9851,
+    "visibility": true
+  }'
+```
+
+</CodeGroup>
+
+## User Context
+
+The API includes user-related fields in data models, indicating future authentication support:
+
+- **Evidence**: `created_by_user_id` field (source: `backend/cmd/api/evidence.go:28`)
+- **Locations**: User-specific vs. community investigations
+- **Investigations**: Associated with user profiles
+
+<Info>
+  While these fields exist in the data models, they are not currently enforced or validated by authentication middleware.
+</Info>
+
+## Planned Features
+
+Based on the codebase structure, future authentication may include:
+
+### User Profiles
+
+The data models reference a User structure with:
+- User ID
+- Username
+- First and last name
+- Profile page URL
+- Account status
+- Created date
+
+Source: `backend/cmd/api/investigations.go:36-44`
+
+### Resource Ownership
+
+The API will likely implement:
+- **Private Locations**: Visible only to the creating user
+- **Community Locations**: Shared with all users
+- **Evidence Visibility**: Public vs. private evidence
+- **Investigation Tracking**: User-specific investigation history
+
+### Authentication Methods
+
+Future authentication may include:
+- API tokens
+- Session-based authentication
+- OAuth integration
+- JWT (JSON Web Tokens)
+
+## Security Considerations
+
+### Current Security Measures
+
+The API implements several security best practices:
+
+1. **Request Size Limits**: Maximum 1 MB request body
+2. **JSON Validation**: Strict parsing with unknown field rejection
+3. **Input Sanitization**: Type checking and validation
+4. **Timeouts**: Connection timeouts prevent resource exhaustion
+   - Read Timeout: 10 seconds
+   - Write Timeout: 30 seconds
+   - Idle Timeout: 1 minute
+
+Source: `backend/cmd/api/main.go:71-73` and `backend/cmd/api/helpers.go:49-53`
+
+### Database Security
+
+The API uses prepared statements through Go's `database/sql` package, which provides protection against SQL injection attacks.
+
+Connection pooling is configured with:
+- Max Open Connections: 25
+- Max Idle Connections: 25
+- Max Idle Time: 15 minutes
+
+Source: `backend/cmd/api/main.go:45-47`
+
+## Testing Without Authentication
+
+Since no authentication is required, you can test all endpoints freely:
+
+<CodeGroup>
+
+```bash Test Healthcheck
+curl -i http://localhost:4000/v1/healthcheck
+```
+
+```bash Test Location Creation
+curl -X POST http://localhost:4000/v1/locations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Winchester Mystery House",
+    "address": "525 S Winchester Blvd, San Jose, CA",
+    "lore": "Construction never stopped to confuse spirits",
+    "latitude": 37.3184,
+    "longitude": -121.9509,
+    "visibility": true
+  }'
+```
+
+```bash Test Error Handling
+curl -i http://localhost:4000/v1/locations/99999
+```
+
+```bash Test Method Not Allowed
+curl -i -X PUT http://localhost:4000/v1/healthcheck
+```
+
+</CodeGroup>
+
+## Migration Path
+
+When authentication is implemented, the API will likely:
+
+1. Add authentication middleware to protected routes
+2. Require authentication tokens in request headers
+3. Maintain backward compatibility for public endpoints (like healthcheck)
+4. Associate resources with authenticated users
+5. Implement role-based access control (RBAC)
+
+<Note>
+  This documentation will be updated once authentication is implemented. Check the API version and release notes for authentication updates.
+</Note>
+
+## Development Considerations
+
+### Environment Configuration
+
+The API supports different environments via the `-env` flag:
+- `development` (default)
+- `staging`
+- `production`
+
+Source: `backend/cmd/api/main.go:41`
+
+Authentication requirements may vary by environment once implemented.
+
+### Database Connection
+
+The database connection string is configured via:
+- Command-line flag: `-db-dsn`
+- Environment variable: `GHOSTPLANET_DB_DSN`
+
+Source: `backend/cmd/api/main.go:43`
+
+<Warning>
+  In production, ensure database credentials are secured and never committed to version control.
+</Warning>

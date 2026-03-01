@@ -1,0 +1,414 @@
+---
+title: Creating and Tracking Investigations
+description: Set up paranormal investigations and manage your investigation workflow
+---
+
+Investigations are structured paranormal research sessions at specific haunted locations. Each investigation tracks evidence, phenomena, and safety information throughout your ghost hunting activities.
+
+## Understanding Investigations
+
+An investigation in Ghost Planet includes:
+
+- **Location Link**: The haunted site being investigated
+- **Phenomena Description**: What paranormal activity you're researching
+- **Evidence Collection**: All audio, photo, text, and EVP evidence gathered
+- **Emergency Contact**: Safety contact information for the investigation
+- **Visibility Settings**: Public or private investigation status
+- **Timestamps**: Automatic tracking of investigation start time
+
+## Creating an Investigation
+
+<Steps>
+  <Step title="Select or create a location">
+    Investigations must be linked to a location. Either:
+    - Choose an existing location from your list or community locations
+    - Create a new location first (see [Managing Locations](/guides/managing-locations))
+
+    <Warning>
+      You cannot create an investigation without a valid location. The location must exist in the database before proceeding.
+    </Warning>
+  </Step>
+
+  <Step title="Define the phenomena">
+    Describe the paranormal activity you're investigating:
+
+    **Phenomena** (required field)
+    - Be specific about reported activity
+    - Include witness accounts or historical claims
+    - Note the time periods when activity is most common
+
+    **Example phenomena descriptions:**
+    ```text
+    Shadow figures reported in east wing hallway between 2-4 AM. 
+    Multiple witnesses describe a tall dark silhouette moving 
+    through walls. Investigating correlation with EMF fluctuations.
+    ```
+
+    ```text
+    Disembodied children's voices heard in room 237. Previous 
+    investigators recorded potential EVPs. Focus on audio 
+    capture and temperature monitoring.
+    ```
+  </Step>
+
+  <Step title="Add emergency contact">
+    Provide safety contact information:
+
+    **Emergency Contact** (required field)
+    - Full name of emergency contact person
+    - Phone number with area code
+    - Relationship to investigator
+
+    **Example:**
+    ```text
+    Sarah Johnson (spouse) - (555) 123-4567
+    ```
+
+    <Note>
+      Ghost Planet takes investigator safety seriously. Always have someone who knows your location and expected return time.
+    </Note>
+  </Step>
+
+  <Step title="Set visibility">
+    Choose who can see this investigation:
+
+    **Public Investigations:**
+    - Visible to all Ghost Planet users
+    - Appear in location investigation history
+    - Evidence can be viewed by the community
+    - Contribute to location popularity metrics
+
+    **Private Investigations:**
+    - Only visible to you
+    - Evidence remains confidential
+    - Useful for ongoing research or sensitive locations
+    - Can be made public later
+  </Step>
+
+  <Step title="Create and begin">
+    Click "Create Investigation" to start. The system will:
+    - Generate a unique investigation ID
+    - Record the creation timestamp
+    - Link the investigation to your user account and location
+    - Prepare the investigation for evidence collection
+  </Step>
+</Steps>
+
+## Investigation Data Structure
+
+Based on the data model from `/workspace/source/backend/internal/data/investigations.go:10`:
+
+```json
+{
+  "id": 42,
+  "user_id": 101,
+  "location_id": 15,
+  "phenomena": "Shadow figures in east wing, cold spots, disembodied footsteps",
+  "created_at": "2026-03-01T22:15:00Z",
+  "evidence": [],
+  "emergency_contact": "Sarah Johnson (spouse) - (555) 123-4567",
+  "visibility": true
+}
+```
+
+<Accordion title="Field Descriptions">
+  - **id**: Auto-generated unique identifier for the investigation
+  - **user_id**: Your user ID (automatically set)
+  - **location_id**: ID of the haunted location being investigated
+  - **phenomena**: Description of paranormal activity being researched
+  - **created_at**: Timestamp when investigation was created (auto-generated)
+  - **evidence**: Array of evidence objects collected during the investigation
+  - **emergency_contact**: Safety contact information
+  - **visibility**: Boolean—true for public, false for private
+</Accordion>
+
+## Adding Evidence to Investigations
+
+Once your investigation is created, you can begin recording evidence:
+
+<Steps>
+  <Step title="Access active investigation">
+    From your dashboard, select the active investigation you want to add evidence to.
+  </Step>
+
+  <Step title="Choose evidence type">
+    Select the type of evidence you're recording:
+    - **Text Notes**: Document observations and phenomena
+    - **Audio Notes**: Record ambient audio or voice notes
+    - **Photos**: Capture visual evidence
+    - **EVPs**: Mark audio as potential Electronic Voice Phenomena
+
+    See [Recording Evidence](/guides/recording-evidence) for detailed capture workflows.
+  </Step>
+
+  <Step title="Submit evidence package">
+    Evidence is bundled and submitted together. Each evidence package includes:
+    - Reference to the investigation ID
+    - Reference to the location ID
+    - Arrays of text notes, audio notes, and photos
+    - Visibility setting (inherits from investigation by default)
+    - Creator user ID (automatically set)
+  </Step>
+</Steps>
+
+<Tip>
+  You can submit multiple evidence packages during a single investigation. Each package receives its own timestamp and ID.
+</Tip>
+
+## Evidence Structure Within Investigations
+
+From `/workspace/source/backend/internal/data/evidence.go:12`, evidence packages link to investigations:
+
+```json
+{
+  "id": 78,
+  "investigation_id": 42,
+  "location_id": 15,
+  "created_by_user_id": 101,
+  "created_at": "2026-03-01T23:45:00Z",
+  "visibility": true,
+  "version": 1
+}
+```
+
+Each evidence package can contain multiple items:
+
+```json
+{
+  "evidence_id": 78,
+  "text_notes": [
+    {
+      "id": 201,
+      "subject": "Cold spot detected",
+      "body": "Temperature dropped from 68°F to 52°F in 30 seconds...",
+      "location_id": 15,
+      "created_at": "2026-03-01T23:45:00Z"
+    }
+  ],
+  "audio_notes": [
+    {
+      "id": 156,
+      "title": "EVP Session 1",
+      "source_url": "https://storage.ghostplanet.com/audio/inv_42_001.mp3",
+      "duration": "00:05:23",
+      "file_size_bytes": 3145728,
+      "is_evp": true,
+      "created_at": "2026-03-01T23:50:00Z"
+    }
+  ],
+  "photos": [
+    {
+      "id": 423,
+      "source_url": "https://storage.ghostplanet.com/photos/inv_42_001.jpg",
+      "thumbnail_url": "https://storage.ghostplanet.com/photos/thumbs/inv_42_001.jpg",
+      "caption": "Orb anomaly near staircase",
+      "file_type": "jpeg",
+      "file_size_bytes": 2458624,
+      "created_at": "2026-03-01T23:52:00Z"
+    }
+  ]
+}
+```
+
+## Managing Active Investigations
+
+### Viewing Investigation Details
+
+<Steps>
+  <Step title="Access your investigations">
+    Navigate to "My Investigations" from the main dashboard to see all your active and completed investigations.
+  </Step>
+
+  <Step title="Select an investigation">
+    Click on an investigation to view:
+    - Location details and map
+    - Phenomena being investigated
+    - All submitted evidence packages
+    - Timeline of evidence collection
+    - Emergency contact information
+  </Step>
+
+  <Step title="Review evidence">
+    Browse collected evidence:
+    - Filter by evidence type (text, audio, photo, EVP)
+    - Sort by timestamp
+    - View evidence details and metadata
+    - Play audio recordings
+    - View photo galleries
+  </Step>
+</Steps>
+
+### Updating Investigation Status
+
+<Steps>
+  <Step title="Edit investigation">
+    From the investigation detail page, click "Edit Investigation" to modify:
+    - Phenomena description (add new observations)
+    - Emergency contact information
+    - Visibility settings
+  </Step>
+
+  <Step title="Mark as complete">
+    When your investigation concludes:
+    - Review all collected evidence
+    - Update the phenomena description with final findings
+    - Optionally change visibility to public to share results
+    - Click "Mark as Complete"
+  </Step>
+</Steps>
+
+<Note>
+  Completed investigations remain in your history and evidence can still be viewed. You can reopen an investigation if you return to the location.
+</Note>
+
+## Investigation Workflows
+
+### Solo Investigation Workflow
+
+<Steps>
+  <Step title="Pre-investigation">
+    - Research the location and create/select it in Ghost Planet
+    - Document expected phenomena
+    - Set up equipment (EMF meters, audio recorders, cameras)
+    - Create the investigation with emergency contact
+  </Step>
+
+  <Step title="During investigation">
+    - Use mobile mode for real-time evidence capture
+    - Record text notes documenting timeline and observations
+    - Capture audio during EVP sessions
+    - Photograph anomalies or areas of interest
+    - Submit evidence packages periodically
+  </Step>
+
+  <Step title="Post-investigation">
+    - Upload additional evidence from dedicated equipment (desktop mode)
+    - Review and analyze all captured evidence
+    - Update phenomena description with findings
+    - Mark investigation as complete
+    - Set appropriate visibility for sharing
+  </Step>
+</Steps>
+
+### Team Investigation Workflow
+
+<Steps>
+  <Step title="Coordinate setup">
+    - Designate one team member as investigation lead
+    - Lead creates the investigation in Ghost Planet
+    - Share investigation ID with team members
+    - All team members can submit evidence to the same investigation
+  </Step>
+
+  <Step title="Divide coverage areas">
+    - Assign team members to different location zones
+    - Each member captures evidence from their assigned area
+    - All evidence links to the single investigation
+    - Coordinate via radio or messaging outside Ghost Planet
+  </Step>
+
+  <Step title="Consolidate findings">
+    - Review all team member evidence submissions
+    - Compare timestamps for correlated activity
+    - Lead investigator updates phenomena with team findings
+    - Collectively decide on investigation visibility
+  </Step>
+</Steps>
+
+## Investigation Best Practices
+
+### Planning
+
+1. **Research first**: Study location history and previous investigation reports before creating your investigation
+2. **Define clear objectives**: Specify what phenomena you're trying to document or validate
+3. **Safety planning**: Always provide valid emergency contact information
+4. **Equipment preparation**: List expected evidence types in your phenomena description
+
+### During Investigation
+
+1. **Document timeline**: Use text notes to create a chronological record of events
+2. **Context for evidence**: Describe conditions when capturing photos or audio (temperature, time, EMF readings)
+3. **Regular submissions**: Submit evidence packages throughout the investigation, not just at the end
+4. **Mark EVPs carefully**: Only flag audio as EVP if you believe it contains potential paranormal voices
+
+### After Investigation
+
+1. **Complete analysis**: Review all evidence before marking investigation complete
+2. **Update phenomena**: Add your findings and conclusions to the phenomena description
+3. **Share responsibly**: Consider making investigations public to contribute to the community knowledge base
+4. **Follow up**: Create new investigations for return visits to track activity over time
+
+## Privacy and Visibility
+
+### When to Use Private Investigations
+
+- Ongoing research you're not ready to share
+- Investigations at sensitive locations (private property, recent tragedies)
+- Personal investigations at your own residence
+- Preliminary visits before full investigation
+
+### When to Use Public Investigations
+
+- Well-known haunted locations open to public
+- Investigations with compelling evidence to share
+- Contributing to community knowledge of a location
+- After completing thorough analysis and documentation
+
+<Warning>
+  Changing an investigation from private to public also makes all associated evidence visible. Review evidence for personal information before publishing.
+</Warning>
+
+## Troubleshooting
+
+<Accordion title="Cannot create investigation without location">
+  Investigations require a valid location ID. To resolve:
+  1. Navigate to "Locations" and create a new location
+  2. Or select an existing location from your list or community locations
+  3. Then return to create your investigation with the location selected
+
+  See [Managing Locations](/guides/managing-locations) for location creation steps.
+</Accordion>
+
+<Accordion title="Evidence not appearing in investigation">
+  Check these common issues:
+  - Verify evidence was submitted with correct investigation ID
+  - Ensure evidence visibility matches investigation visibility
+  - Refresh the investigation page to load latest evidence
+  - Check that you're viewing the evidence tab, not just investigation details
+</Accordion>
+
+<Accordion title="Cannot edit investigation phenomena">
+  If the edit option is disabled:
+  - Verify you are the investigation creator (user_id matches)
+  - Check that you're logged in with the correct account
+  - Private investigations can only be edited by the creator
+  - Public investigations may have edit restrictions after community contributions
+</Accordion>
+
+<Accordion title="Emergency contact field shows validation error">
+  The emergency contact field is required and must contain valid information:
+  - Include both name and phone number
+  - Format: "Name (relationship) - Phone"
+  - Example: "John Doe (friend) - (555) 123-4567"
+  - Cannot be left empty
+</Accordion>
+
+<Accordion title="Investigation appears in wrong location">
+  Each investigation can only be linked to one location. To fix:
+  1. Create a new investigation with the correct location
+  2. Re-submit evidence to the new investigation
+  3. Mark the incorrect investigation as complete or delete it
+
+  Note: You cannot change an investigation's location after creation.
+</Accordion>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Recording Evidence" icon="camera" href="/guides/recording-evidence">
+    Learn how to capture and submit investigation evidence
+  </Card>
+  <Card title="Managing Locations" icon="map-location-dot" href="/guides/managing-locations">
+    Create and organize haunted locations for investigations
+  </Card>
+</CardGroup>

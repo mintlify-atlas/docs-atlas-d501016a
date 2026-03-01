@@ -1,0 +1,243 @@
+---
+title: 'API Overview'
+description: 'Ghost Planet REST API introduction, base URL, versioning, and response formats'
+---
+
+## Introduction
+
+The Ghost Planet API is a RESTful JSON API built with Go that provides access to paranormal investigation data, including locations, evidence, and investigations. The API uses standard HTTP methods and returns JSON responses with a consistent envelope format.
+
+## Base URL
+
+All API requests should be made to:
+
+```text
+http://localhost:4000/v1
+```
+
+<Note>
+  The API runs on port 4000 by default in development mode. The base path `/v1` indicates API version 1.0.0.
+</Note>
+
+## API Version
+
+The current API version is **1.0.0**. The version is included in the base path (`/v1/`) and can be verified via the healthcheck endpoint.
+
+Source: `backend/cmd/api/main.go:18`
+
+## Server Configuration
+
+The API server is configured with the following default settings:
+
+- **Port**: 4000 (configurable via `-port` flag)
+- **Environment**: development (configurable via `-env` flag)
+- **Read Timeout**: 10 seconds
+- **Write Timeout**: 30 seconds
+- **Idle Timeout**: 1 minute
+- **Database**: PostgreSQL with connection pooling
+  - Max Open Connections: 25
+  - Max Idle Connections: 25
+  - Max Idle Time: 15 minutes
+
+Source: `backend/cmd/api/main.go:40-74`
+
+## Response Format
+
+All API responses use a JSON envelope format for consistency and extensibility.
+
+### Success Response Structure
+
+Successful responses wrap data in a descriptive key:
+
+```json
+{
+  "location": {
+    "id": 1,
+    "name": "Haunted Manor",
+    "address": "123 Spooky St, Albuquerque, NM",
+    "latitude": 40.7128,
+    "longitude": -74.0060,
+    "visibility": true
+  }
+}
+```
+
+<Info>
+  The envelope format uses an indented JSON structure with tabs for readability. All responses end with a newline character.
+</Info>
+
+### Response Headers
+
+All JSON responses include:
+
+```http
+Content-Type: application/json
+```
+
+Source: `backend/cmd/api/helpers.go:27-46`
+
+## Error Responses
+
+Error responses follow a consistent format with an `error` key:
+
+```json
+{
+  "error": "the requested resource could not be found"
+}
+```
+
+### HTTP Status Codes
+
+The API uses standard HTTP status codes:
+
+| Status Code | Meaning | Description |
+|-------------|---------|-------------|
+| `200` | OK | Request succeeded |
+| `201` | Created | Resource created successfully |
+| `400` | Bad Request | Invalid request format or parameters |
+| `404` | Not Found | Resource not found |
+| `405` | Method Not Allowed | HTTP method not supported for this endpoint |
+| `422` | Unprocessable Entity | Validation failed |
+| `500` | Internal Server Error | Server encountered an error |
+
+### Error Types
+
+The API returns different error messages based on the error type:
+
+<CodeGroup>
+
+```json 404 Not Found
+{
+  "error": "the requested resource could not be found"
+}
+```
+
+```json 405 Method Not Allowed
+{
+  "error": "the POST method is not supported for this resource"
+}
+```
+
+```json 422 Validation Error
+{
+  "error": {
+    "name": "must be provided",
+    "latitude": "must be a valid coordinate"
+  }
+}
+```
+
+```json 500 Server Error
+{
+  "error": "the server encountered a problem and could not process your request"
+}
+```
+
+</CodeGroup>
+
+<Warning>
+  Validation errors (422) return a map of field names to error messages, while other errors return a single string message.
+</Warning>
+
+Source: `backend/cmd/api/errors.go:12-45`
+
+## Request Limits
+
+### Request Body Size
+
+The API enforces a maximum request body size:
+
+- **Maximum Size**: 1 MB (1,048,576 bytes)
+
+Requests exceeding this limit will receive a 400 Bad Request error:
+
+```json
+{
+  "error": "body must not be larger than 1048576 bytes"
+}
+```
+
+Source: `backend/cmd/api/helpers.go:49`
+
+### Request Body Validation
+
+The API strictly validates JSON requests:
+
+- Request body must contain valid JSON
+- Unknown fields are rejected
+- Field types must match expected types
+- Body must contain exactly one JSON value
+- Empty bodies are rejected
+
+<CodeGroup>
+
+```bash Valid Request
+curl -X POST http://localhost:4000/v1/locations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Abandoned Hospital",
+    "address": "456 Dark Ave",
+    "latitude": 34.0522,
+    "longitude": -118.2437,
+    "visibility": true
+  }'
+```
+
+```bash Unknown Field Error
+curl -X POST http://localhost:4000/v1/locations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Test Location",
+    "invalid_field": "value"
+  }'
+
+# Response:
+# {
+#   "error": "body contains unknown key \"invalid_field\""
+# }
+```
+
+</CodeGroup>
+
+Source: `backend/cmd/api/helpers.go:48-99`
+
+## Health Check
+
+Use the health check endpoint to verify API availability:
+
+```bash
+curl http://localhost:4000/v1/healthcheck
+```
+
+Response:
+
+```json
+{
+  "status": "available",
+  "system_info": {
+    "status": "available",
+    "environment": "development",
+    "version": "1.0.0"
+  }
+}
+```
+
+Source: `backend/cmd/api/healthcheck.go:7-21`
+
+## Content Type
+
+All requests with a body must include the appropriate Content-Type header:
+
+```http
+Content-Type: application/json
+```
+
+<Note>
+  The API only accepts JSON payloads. Other content types will be rejected.
+</Note>
+
+## Router
+
+The API uses [httprouter](https://github.com/julienschmidt/httprouter) for fast HTTP routing with support for URL parameters and automatic OPTIONS responses.
+
+Source: `backend/cmd/api/routes.go:9`

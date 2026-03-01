@@ -1,0 +1,195 @@
+---
+title: 'Investigations'
+description: 'Create and manage paranormal investigations'
+---
+
+## POST /v1/investigations
+
+Create a new investigation record. An investigation represents a ghost hunting session at a specific location.
+
+<Note>
+This endpoint is currently under development and returns a placeholder response.
+</Note>
+
+### Request Body
+
+<ParamField body="user_id" type="integer" required>
+  ID of the user conducting the investigation
+</ParamField>
+
+<ParamField body="location_id" type="integer" required>
+  ID of the location being investigated
+</ParamField>
+
+<ParamField body="phenomena" type="string" required>
+  Description of the paranormal phenomena being investigated
+</ParamField>
+
+<ParamField body="emergency_contact" type="string" required>
+  Emergency contact information for the investigation team
+</ParamField>
+
+<ParamField body="visibility" type="boolean" required>
+  Whether the investigation is public (true) or private (false)
+</ParamField>
+
+<ParamField body="evidence" type="array">
+  Array of evidence items collected during the investigation
+  
+  <Expandable title="Evidence Object">
+    <ResponseField name="id" type="integer">
+      Unique identifier for the evidence
+    </ResponseField>
+    
+    <ResponseField name="investigation_id" type="integer">
+      ID of the parent investigation
+    </ResponseField>
+    
+    <ResponseField name="location_id" type="integer">
+      ID of the location where evidence was collected
+    </ResponseField>
+    
+    <ResponseField name="visibility" type="boolean">
+      Whether the evidence is public or private
+    </ResponseField>
+  </Expandable>
+</ParamField>
+
+### Response
+
+<ResponseField name="id" type="integer">
+  Unique identifier for the created investigation
+</ResponseField>
+
+<ResponseField name="user_id" type="integer">
+  ID of the user conducting the investigation
+</ResponseField>
+
+<ResponseField name="location_id" type="integer">
+  ID of the investigation location
+</ResponseField>
+
+<ResponseField name="phenomena" type="string">
+  Description of the paranormal phenomena
+</ResponseField>
+
+<ResponseField name="emergency_contact" type="string">
+  Emergency contact information
+</ResponseField>
+
+<ResponseField name="visibility" type="boolean">
+  Public or private status
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of when the investigation was created
+</ResponseField>
+
+<ResponseField name="evidence" type="array">
+  Array of evidence items associated with this investigation
+</ResponseField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST http://localhost:4000/v1/investigations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": 1,
+    "location_id": 42,
+    "phenomena": "Unexplained cold spots and shadow figures in the east wing",
+    "emergency_contact": "John Doe - (555) 123-4567",
+    "visibility": true,
+    "evidence": []
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:4000/v1/investigations', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    user_id: 1,
+    location_id: 42,
+    phenomena: 'Unexplained cold spots and shadow figures in the east wing',
+    emergency_contact: 'John Doe - (555) 123-4567',
+    visibility: true,
+    evidence: []
+  })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'http://localhost:4000/v1/investigations',
+    json={
+        'user_id': 1,
+        'location_id': 42,
+        'phenomena': 'Unexplained cold spots and shadow figures in the east wing',
+        'emergency_contact': 'John Doe - (555) 123-4567',
+        'visibility': True,
+        'evidence': []
+    }
+)
+
+data = response.json()
+```
+
+</CodeGroup>
+
+### Error Responses
+
+<ResponseField name="error" type="object">
+  Error details when the request fails
+</ResponseField>
+
+#### 400 Bad Request
+
+Returned when the request body is malformed or contains invalid JSON.
+
+```json
+{
+  "error": "body contains badly-formed JSON (at position 15)"
+}
+```
+
+#### 404 Not Found
+
+Returned when the requested resource does not exist.
+
+```json
+{
+  "error": "the requested resource could not be found"
+}
+```
+
+#### 422 Unprocessable Entity
+
+Returned when validation fails on the provided data.
+
+```json
+{
+  "error": {
+    "phenomena": "must be provided",
+    "emergency_contact": "must be provided"
+  }
+}
+```
+
+#### 500 Internal Server Error
+
+Returned when the server encounters an unexpected error.
+
+```json
+{
+  "error": "the server encountered a problem and could not process your request"
+}
+```

@@ -1,0 +1,179 @@
+---
+title: Welcome to Ghost Planet
+description: An all-in-one paranormal investigation platform designed to help newcomers get into the field
+---
+
+
+
+## Your journey into paranormal investigation starts here
+
+Ghost Planet is a free, community-driven platform that empowers anyone to conduct, document, and share paranormal investigations. Whether you're using a mobile device in the field or organizing evidence on desktop, Ghost Planet provides the tools you need to explore the unexplained.
+
+<Note>
+Ghost Planet is currently in active development. Features and functionality are being continuously improved based on community feedback.
+</Note>
+
+## Core features
+
+<CardGroup cols={2}>
+  <Card
+    title="Investigation management"
+    icon="compass"
+    href="#investigations"
+  >
+    Create and track paranormal investigations with location linking, phenomena descriptions, and emergency contacts
+  </Card>
+  <Card
+    title="Evidence collection"
+    icon="camera"
+    href="#evidence"
+  >
+    Capture photos, audio recordings, EVPs, and text notes during your investigations
+  </Card>
+  <Card
+    title="Location database"
+    icon="map-location-dot"
+    href="#locations"
+  >
+    Access community-shared locations or create private ones with coordinates, lore, and investigation history
+  </Card>
+  <Card
+    title="Mobile and desktop modes"
+    icon="mobile-screen"
+    href="#modes"
+  >
+    Field-ready mobile capture tools and comprehensive desktop evidence management
+  </Card>
+</CardGroup>
+
+## Investigations
+
+Investigations are the heart of Ghost Planet. Each investigation includes:
+
+- **Location tracking**: Link to existing community locations or create private ones
+- **Phenomena documentation**: Record what you're investigating
+- **Evidence collection**: Attach multiple types of evidence
+- **Safety features**: Add emergency contact information
+- **Privacy controls**: Choose between public and private visibility
+
+<Info>
+Investigations connect locations, evidence, and users into a complete record of your paranormal research.
+</Info>
+
+## Evidence
+
+Ghost Planet supports multiple evidence types to capture your findings:
+
+### Text notes
+Document observations, impressions, and context during investigations.
+
+```json
+{
+  "subject": "Cold spot in master bedroom",
+  "body": "Temperature dropped approximately 15 degrees near the northeast corner. Lasted approximately 2 minutes before dissipating.",
+  "location_id": 123,
+  "created_at": "2026-03-01T20:15:00Z"
+}
+```
+
+### Photos
+Capture visual evidence with captions and metadata.
+
+- Supported formats: JPEG, JPG, PNG, WebP
+- Maximum file size: 5 MB
+- Automatic thumbnail generation
+
+### Audio recordings
+Record ambient sounds, investigator notes, and potential EVPs (Electronic Voice Phenomena).
+
+- Maximum file size: 5 MB
+- Duration tracking
+- EVP classification flag
+
+<Warning>
+All evidence requires a valid location association and respects the investigation's visibility settings.
+</Warning>
+
+## Locations
+
+Locations form a shared knowledge base of investigated sites:
+
+**Location information includes:**
+- Name and full address
+- GPS coordinates (latitude/longitude)
+- Historical lore and background stories
+- Past investigation records
+- Popularity metrics
+- Public or private visibility
+
+**Coordinate validation:**
+- Latitude must be between -90 and 90
+- Longitude must be between -180 and 180
+
+<Tip>
+Contribute verified locations to the community database to help other investigators discover new sites.
+</Tip>
+
+## Modes
+
+### Mobile mode
+Optimized for field work:
+- Camera access for photos and video
+- Microphone for audio notes and EVP capture
+- Quick text note entry
+- Real-time evidence upload
+
+### Desktop mode
+Comprehensive evidence management:
+- Bulk file uploads (photos, audio, video)
+- Webcam for investigator documentation
+- Interactive map interface (Mappy)
+- Location database browser with detailed cards
+- Investigation organization and review
+
+## Get started
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart guide"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Set up your account and conduct your first investigation in minutes
+  </Card>
+  <Card
+    title="API reference"
+    icon="code"
+    href="/api/overview"
+  >
+    Integrate with Ghost Planet's REST API
+  </Card>
+  <Card
+    title="Feature guides"
+    icon="book"
+    href="/guides/creating-investigations"
+  >
+    Learn how to create investigations and record evidence
+  </Card>
+  <Card
+    title="Core features"
+    icon="star"
+    href="/features/investigations"
+  >
+    Explore investigations, evidence, and location features
+  </Card>
+</CardGroup>
+
+## Community values
+
+Ghost Planet is built on principles of accessibility, respect, and scientific curiosity:
+
+- **Free and accessible**: Available in standard and low-bandwidth formats
+- **Welcoming community**: No tolerance for hateful or condescending language
+- **Evidence-based**: Focus on replicable methods and productive knowledge sharing
+- **Privacy-respecting**: Control your data with public/private visibility options
+- **Safety-first**: Emergency contact features and responsible investigation practices
+
+<Info>
+Verified community members can contribute to public locations after demonstrating positive engagement through their investigations and community activity.
+</Info>

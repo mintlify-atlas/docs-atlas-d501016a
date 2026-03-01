@@ -1,0 +1,345 @@
+---
+title: Managing Haunted Locations
+description: Create, configure, and organize paranormal investigation locations
+---
+
+Locations are the foundation of Ghost Planet investigations. Each location represents a haunted site where paranormal activity has been reported or investigated.
+
+## Understanding Locations
+
+Locations in Ghost Planet contain:
+
+- **Basic Information**: Name, full address with city/state/zip
+- **Geographic Data**: Latitude and longitude coordinates
+- **Historical Context**: Lore and reported paranormal activity
+- **Investigation History**: Past investigations by you and the community
+- **Popularity Metrics**: Community engagement and investigation frequency
+- **Visibility Settings**: Public or private location access
+
+## Creating a New Location
+
+<Steps>
+  <Step title="Navigate to locations">
+    From the main dashboard, click "Locations" and then "Create New Location" to begin.
+  </Step>
+
+  <Step title="Enter basic information">
+    Fill in the required location details:
+
+    **Name** (required, max 500 characters)
+    - Use the common or historical name of the location
+    - Examples: "The Stanley Hotel", "Waverly Hills Sanatorium", "Old Mill Ruins"
+
+    **Address** (required)
+    - Provide the complete street address
+    - Include city, state, and ZIP code
+    - Example: "333 Wonderview Ave, Estes Park, CO 80517"
+  </Step>
+
+  <Step title="Set geographic coordinates">
+    Add precise location coordinates:
+
+    **Latitude** (required)
+    - Must be between -90 and 90
+    - Use decimal degrees format
+    - Example: 40.7128
+
+    **Longitude** (required)
+    - Must be between -180 and 180
+    - Use decimal degrees format
+    - Example: -74.0060
+
+    <Tip>
+      Use Google Maps or another mapping service to find exact coordinates. Right-click the location and select coordinates to copy them.
+    </Tip>
+  </Step>
+
+  <Step title="Add location lore">
+    Document the paranormal history (required, max 500 characters):
+    - Describe reported phenomena and activity
+    - Include historical context or tragic events
+    - Cite local legends or eyewitness accounts
+
+    **Example lore:**
+    ```text
+    Former tuberculosis hospital (1910-1962) where over 6,000 patients died. 
+    Visitors report shadow figures in the body chute, disembodied voices on 
+    the fourth floor, and the ghost of a young girl named Mary playing with 
+    a ball in the children's ward.
+    ```
+  </Step>
+
+  <Step title="Configure visibility">
+    Choose who can see this location:
+
+    **Public Locations:**
+    - Visible to all Ghost Planet users
+    - Appears in community location searches
+    - Other users can investigate and add evidence
+    - Contributes to your community location count
+
+    **Private Locations:**
+    - Only visible to you
+    - Not searchable by other users
+    - You control all investigation access
+    - Useful for sensitive or personal sites
+  </Step>
+
+  <Step title="Review and save">
+    Verify all information is accurate, then click "Create Location". The system will validate your input and create the location if all requirements are met.
+  </Step>
+</Steps>
+
+<Warning>
+  Coordinates are validated strictly. Latitude must be between -90 and 90, longitude between -180 and 180. Invalid coordinates will prevent location creation.
+</Warning>
+
+## Location Validation Rules
+
+The backend enforces these validation rules from `/workspace/source/backend/internal/data/investigations.go:66`:
+
+<Accordion title="Name Validation">
+  ```go
+  v.Check(location.Name != "", "name", "must be provided")
+  v.Check(len(location.Name) <= 500, "name", "must not be more than 500 bytes long")
+  ```
+
+  - Name is required (cannot be empty)
+  - Maximum length: 500 bytes
+  - No special character restrictions
+</Accordion>
+
+<Accordion title="Address Validation">
+  ```go
+  v.Check(location.Address != "", "address", "must be provided")
+  ```
+
+  - Address is required (cannot be empty)
+  - No format restrictions currently enforced
+  - Should include street, city, state, and ZIP
+</Accordion>
+
+<Accordion title="Lore Validation">
+  ```go
+  v.Check(location.Lore != "", "lore", "must be provided")
+  v.Check(len(location.Lore) <= 500, "lore", "must not be more than 500 bytes long")
+  ```
+
+  - Lore is required (cannot be empty)
+  - Maximum length: 500 bytes
+  - Should provide historical context or paranormal activity description
+</Accordion>
+
+<Accordion title="Latitude Validation">
+  ```go
+  v.Check(!math.IsNaN(location.Latitude), "latitude", "must be a valid number")
+  v.Check(!math.IsInf(location.Latitude, 0), "latitude", "must be a finite number")
+  v.Check(location.Latitude > -90 && location.Latitude < 90, "latitude", "must be between -90 and 90")
+  ```
+
+  - Must be a valid number (not NaN)
+  - Must be finite (not infinity)
+  - Must be between -90 and 90 (exclusive)
+  - Use decimal degrees format
+</Accordion>
+
+<Accordion title="Longitude Validation">
+  ```go
+  v.Check(!math.IsNaN(location.Longitude), "longitude", "must be a valid number")
+  v.Check(!math.IsInf(location.Longitude, 0), "longitude", "must be a finite number")
+  v.Check(location.Longitude > -180 && location.Longitude < 180, "longitude", "must be between -180 and 180")
+  ```
+
+  - Must be a valid number (not NaN)
+  - Must be finite (not infinity)
+  - Must be between -180 and 180 (exclusive)
+  - Use decimal degrees format
+</Accordion>
+
+## Location Data Structure
+
+Here's the complete location object structure from `/workspace/source/backend/internal/data/investigations.go:35`:
+
+```json
+{
+  "id": 42,
+  "name": "Waverly Hills Sanatorium",
+  "address": "4400 Paralee Drive, Louisville, KY 40272",
+  "state": "KY",
+  "city": "Louisville",
+  "zip": "40272",
+  "lore": "Former tuberculosis hospital where over 6,000 patients died. Reports of shadow figures, disembodied voices, and ghostly children.",
+  "latitude": 38.1347,
+  "longitude": -85.9358,
+  "past_investigations_user": [],
+  "past_investigations_community": [],
+  "popularity": {
+    "investigation_count": 156,
+    "evidence_submissions": 847,
+    "star_rating": 4.7
+  },
+  "visibility": true,
+  "created_by_user_id": 101,
+  "owner_user_id": 101
+}
+```
+
+<Note>
+  The `id`, `created_by_user_id`, `owner_user_id`, and popularity metrics are automatically generated. You only need to provide the basic information fields.
+</Note>
+
+## Editing Existing Locations
+
+<Steps>
+  <Step title="Find your location">
+    Navigate to "My Locations" and select the location you want to edit. Only locations you created can be edited.
+  </Step>
+
+  <Step title="Update fields">
+    Modify any of the editable fields:
+    - Name, address, city, state, ZIP
+    - Lore and historical information
+    - Coordinates (if more precise data is available)
+    - Visibility settings
+  </Step>
+
+  <Step title="Save changes">
+    Click "Update Location". Changes are validated using the same rules as creation.
+  </Step>
+</Steps>
+
+<Warning>
+  Changing a location from public to private will hide it from other users, but existing community investigations at that location will remain visible to their creators.
+</Warning>
+
+## Managing Investigation History
+
+Locations track two types of investigation history:
+
+### Your Investigations
+
+The `past_investigations_user` array contains all investigations you've conducted at this location. This helps you:
+- Track your investigation frequency at specific sites
+- Review your historical evidence from the location
+- Identify patterns in paranormal activity over time
+
+### Community Investigations
+
+For public locations, `past_investigations_community` shows investigations by other users. This provides:
+- Validation of reported phenomena from multiple sources
+- Different perspectives and evidence types
+- Collaboration opportunities with other investigators
+
+<Tip>
+  High community investigation counts indicate popular or highly active paranormal sites. Check the popularity metrics to find trending locations.
+</Tip>
+
+## Popularity System
+
+Public locations accumulate popularity based on:
+
+- **Investigation Count**: Total number of investigations conducted
+- **Evidence Submissions**: Amount of evidence recorded at the location
+- **Star Rating**: Community ratings from investigators
+
+Locations with higher popularity appear more prominently in search results and recommendations.
+
+## Finding Existing Locations
+
+<Steps>
+  <Step title="Use location search">
+    Click "Find Locations" and enter search criteria:
+    - Location name or keywords
+    - City, state, or region
+    - Specific phenomena types
+  </Step>
+
+  <Step title="Filter results">
+    Narrow results using filters:
+    - **Visibility**: Public locations only or include your private locations
+    - **Popularity**: Sort by investigation count or star rating
+    - **Distance**: Show locations near your current position
+  </Step>
+
+  <Step title="View location details">
+    Click a location to see:
+    - Full lore and paranormal history
+    - Map with exact coordinates
+    - Past investigation summaries
+    - Evidence gallery from all investigations
+  </Step>
+</Steps>
+
+## Best Practices
+
+### Creating Quality Locations
+
+1. **Research thoroughly**: Verify paranormal claims and historical facts before documenting lore
+2. **Use precise coordinates**: GPS coordinates ensure investigators can find the exact site
+3. **Write compelling lore**: Include specific phenomena, time periods, and eyewitness accounts
+4. **Update regularly**: Add new information as you conduct more investigations
+
+### Privacy Considerations
+
+1. **Private residences**: Always mark residential locations as private unless you have explicit permission
+2. **Sensitive sites**: Use private mode for locations with tragic recent history
+3. **Legal access**: Only create locations where paranormal investigation is legally permitted
+4. **Coordinate accuracy**: Ensure coordinates don't expose private property boundaries
+
+### Community Contributions
+
+1. **Share freely**: Make locations public when appropriate to build the investigation community
+2. **Maintain accuracy**: Keep information factual and avoid sensationalism
+3. **Cite sources**: Reference local historical societies or documented accounts when available
+4. **Respect others**: Don't duplicate existing public locations—contribute to them instead
+
+## Troubleshooting
+
+<Accordion title="'Latitude must be between -90 and 90' error">
+  Your latitude value is outside the valid range:
+  - Latitude measures north/south and cannot exceed ±90 degrees
+  - Check that you didn't swap latitude and longitude
+  - Verify you're using decimal degrees, not degrees-minutes-seconds format
+  - Example valid latitude: 40.7128 (New York City)
+</Accordion>
+
+<Accordion title="'Longitude must be between -180 and 180' error">
+  Your longitude value is outside the valid range:
+  - Longitude measures east/west and cannot exceed ±180 degrees
+  - Ensure you're using negative values for western hemisphere
+  - Example valid longitude: -74.0060 (New York City)
+</Accordion>
+
+<Accordion title="'Name must not be more than 500 bytes' error">
+  The location name is too long:
+  - Keep names concise and descriptive
+  - Move detailed information to the lore field
+  - Example: Use "Old Miller Hospital" instead of "The Old Miller County General Hospital Established in 1923 and Abandoned in 1987"
+</Accordion>
+
+<Accordion title="Can't find coordinates for my location">
+  Use these methods to find accurate coordinates:
+  1. **Google Maps**: Right-click the location and click the coordinates that appear
+  2. **GPS device**: Visit the site with a GPS-enabled device and record coordinates
+  3. **Address lookup**: Use a geocoding service to convert the address to coordinates
+  4. **Street view**: Use Google Street View to pinpoint the exact building or site
+</Accordion>
+
+<Accordion title="Location appears but coordinates are wrong">
+  To update coordinates:
+  1. Edit the location from your "My Locations" list
+  2. Enter the corrected latitude and longitude
+  3. Save changes—the system will validate the new coordinates
+  4. Evidence and investigations remain linked to the location
+</Accordion>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Creating Investigations" icon="clipboard-list" href="/guides/creating-investigations">
+    Set up investigations at your locations
+  </Card>
+  <Card title="Recording Evidence" icon="camera" href="/guides/recording-evidence">
+    Capture paranormal evidence during investigations
+  </Card>
+</CardGroup>

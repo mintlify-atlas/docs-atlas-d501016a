@@ -1,0 +1,414 @@
+---
+title: 'Evidence'
+description: 'Manage paranormal evidence including photos, audio notes, and text observations'
+---
+
+## POST /v1/evidence
+
+Create a new evidence record with associated text notes, audio recordings, and photos from a paranormal investigation.
+
+### Request Body
+
+<ParamField body="investigation_id" type="integer" required>
+  ID of the investigation this evidence belongs to
+</ParamField>
+
+<ParamField body="location_id" type="integer" required>
+  ID of the location where this evidence was collected
+</ParamField>
+
+<ParamField body="created_by_user_id" type="integer" required>
+  ID of the user who created this evidence
+</ParamField>
+
+<ParamField body="visibility" type="boolean" required>
+  Whether the evidence is public (true) or private (false)
+</ParamField>
+
+<ParamField body="text_notes" type="array">
+  Array of text observations and notes
+  
+  <Expandable title="TextNote Object">
+    <ResponseField name="subject" type="string" required>
+      Subject or title of the note (max 500 bytes)
+    </ResponseField>
+    
+    <ResponseField name="body" type="string" required>
+      Detailed note content (max 10,000 bytes)
+    </ResponseField>
+    
+    <ResponseField name="location_id" type="integer" required>
+      ID of the location where the note was taken
+    </ResponseField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="audio_notes" type="array">
+  Array of audio recordings including EVPs (Electronic Voice Phenomena)
+  
+  <Expandable title="AudioNote Object">
+    <ResponseField name="title" type="string">
+      Title or description of the audio recording
+    </ResponseField>
+    
+    <ResponseField name="source_url" type="string" required>
+      URL to the audio file (max 2000 bytes)
+    </ResponseField>
+    
+    <ResponseField name="duration" type="integer">
+      Duration of the audio in seconds
+    </ResponseField>
+    
+    <ResponseField name="file_size_bytes" type="integer" required>
+      Size of the audio file in bytes (max 5 MB)
+    </ResponseField>
+    
+    <ResponseField name="is_evp" type="boolean">
+      Whether this audio contains an Electronic Voice Phenomenon
+    </ResponseField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="photos" type="array">
+  Array of photographic evidence
+  
+  <Expandable title="Photo Object">
+    <ResponseField name="source_url" type="string" required>
+      URL to the full-size image (max 2000 bytes)
+    </ResponseField>
+    
+    <ResponseField name="thumbnail_url" type="string">
+      URL to the thumbnail image
+    </ResponseField>
+    
+    <ResponseField name="caption" type="string" required>
+      Description of what the photo shows (max 500 bytes)
+    </ResponseField>
+    
+    <ResponseField name="file_type" type="string" required>
+      Image file type: jpeg, jpg, png, or webp
+    </ResponseField>
+    
+    <ResponseField name="file_size_bytes" type="integer" required>
+      Size of the image file in bytes (max 5 MB)
+    </ResponseField>
+  </Expandable>
+</ParamField>
+
+### Validation Rules
+
+#### Text Notes
+- `subject`: Required, max 500 bytes
+- `body`: Required, max 10,000 bytes
+
+#### Audio Notes
+- `source_url`: Required, max 2000 bytes
+- `file_size_bytes`: Must be between 1 byte and 5 MB (5,242,880 bytes)
+
+#### Photos
+- `source_url`: Required, max 2000 bytes
+- `file_type`: Must be one of: jpeg, jpg, png, webp (case-insensitive)
+- `file_size_bytes`: Must be between 1 byte and 5 MB (5,242,880 bytes)
+- `caption`: Required, max 500 bytes
+
+### Response
+
+<ResponseField name="id" type="integer">
+  Unique identifier for the evidence record
+</ResponseField>
+
+<ResponseField name="investigation_id" type="integer">
+  ID of the parent investigation
+</ResponseField>
+
+<ResponseField name="location_id" type="integer">
+  ID of the location
+</ResponseField>
+
+<ResponseField name="created_by_user_id" type="integer">
+  ID of the user who created the evidence
+</ResponseField>
+
+<ResponseField name="visibility" type="boolean">
+  Public or private status
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  ISO 8601 timestamp of creation
+</ResponseField>
+
+<ResponseField name="version" type="integer">
+  Version number for optimistic locking
+</ResponseField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST http://localhost:4000/v1/evidence \
+  -H "Content-Type: application/json" \
+  -d '{
+    "investigation_id": 42,
+    "location_id": 15,
+    "created_by_user_id": 1,
+    "visibility": true,
+    "text_notes": [
+      {
+        "subject": "Strange cold spot detected",
+        "body": "At approximately 2:15 AM, temperature dropped 15 degrees in the east hallway. EMF readings spiked to 4.2 mG. Duration: 3 minutes.",
+        "location_id": 15
+      }
+    ],
+    "audio_notes": [
+      {
+        "title": "EVP - Female voice",
+        "source_url": "https://storage.example.com/audio/evp_20260301_0215.mp3",
+        "duration": 180,
+        "file_size_bytes": 2457600,
+        "is_evp": true
+      }
+    ],
+    "photos": [
+      {
+        "source_url": "https://storage.example.com/photos/orb_20260301_0215.jpg",
+        "thumbnail_url": "https://storage.example.com/photos/thumbs/orb_20260301_0215.jpg",
+        "caption": "Unexplained orb of light near staircase",
+        "file_type": "jpg",
+        "file_size_bytes": 3145728
+      }
+    ]
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:4000/v1/evidence', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    investigation_id: 42,
+    location_id: 15,
+    created_by_user_id: 1,
+    visibility: true,
+    text_notes: [
+      {
+        subject: 'Strange cold spot detected',
+        body: 'At approximately 2:15 AM, temperature dropped 15 degrees in the east hallway. EMF readings spiked to 4.2 mG. Duration: 3 minutes.',
+        location_id: 15
+      }
+    ],
+    audio_notes: [
+      {
+        title: 'EVP - Female voice',
+        source_url: 'https://storage.example.com/audio/evp_20260301_0215.mp3',
+        duration: 180,
+        file_size_bytes: 2457600,
+        is_evp: true
+      }
+    ],
+    photos: [
+      {
+        source_url: 'https://storage.example.com/photos/orb_20260301_0215.jpg',
+        thumbnail_url: 'https://storage.example.com/photos/thumbs/orb_20260301_0215.jpg',
+        caption: 'Unexplained orb of light near staircase',
+        file_type: 'jpg',
+        file_size_bytes: 3145728
+      }
+    ]
+  })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'http://localhost:4000/v1/evidence',
+    json={
+        'investigation_id': 42,
+        'location_id': 15,
+        'created_by_user_id': 1,
+        'visibility': True,
+        'text_notes': [
+            {
+                'subject': 'Strange cold spot detected',
+                'body': 'At approximately 2:15 AM, temperature dropped 15 degrees in the east hallway. EMF readings spiked to 4.2 mG. Duration: 3 minutes.',
+                'location_id': 15
+            }
+        ],
+        'audio_notes': [
+            {
+                'title': 'EVP - Female voice',
+                'source_url': 'https://storage.example.com/audio/evp_20260301_0215.mp3',
+                'duration': 180,
+                'file_size_bytes': 2457600,
+                'is_evp': True
+            }
+        ],
+        'photos': [
+            {
+                'source_url': 'https://storage.example.com/photos/orb_20260301_0215.jpg',
+                'thumbnail_url': 'https://storage.example.com/photos/thumbs/orb_20260301_0215.jpg',
+                'caption': 'Unexplained orb of light near staircase',
+                'file_type': 'jpg',
+                'file_size_bytes': 3145728
+            }
+        ]
+    }
+)
+
+data = response.json()
+```
+
+</CodeGroup>
+
+### Example Response
+
+```json
+{
+  "evidence": {
+    "id": 127,
+    "investigation_id": 42,
+    "location_id": 15,
+    "created_by_user_id": 1,
+    "visibility": true,
+    "created_at": "2026-03-01T02:15:00Z",
+    "version": 1
+  }
+}
+```
+
+---
+
+## GET /v1/evidence/:id
+
+Retrieve a specific evidence record by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the evidence record
+</ParamField>
+
+### Response
+
+<ResponseField name="evidence" type="object">
+  The evidence record
+  
+  <Expandable title="Evidence Object">
+    <ResponseField name="id" type="integer">
+      Unique identifier
+    </ResponseField>
+    
+    <ResponseField name="investigation_id" type="integer">
+      Parent investigation ID
+    </ResponseField>
+    
+    <ResponseField name="location_id" type="integer">
+      Location ID where evidence was collected
+    </ResponseField>
+    
+    <ResponseField name="created_by_user_id" type="integer">
+      User who created the evidence
+    </ResponseField>
+    
+    <ResponseField name="visibility" type="boolean">
+      Public or private status
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp of creation
+    </ResponseField>
+    
+    <ResponseField name="version" type="integer">
+      Version number for optimistic locking
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl http://localhost:4000/v1/evidence/127
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:4000/v1/evidence/127');
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get('http://localhost:4000/v1/evidence/127')
+data = response.json()
+```
+
+</CodeGroup>
+
+### Example Response
+
+```json
+{
+  "evidence": {
+    "id": 127,
+    "investigation_id": 42,
+    "location_id": 15,
+    "created_by_user_id": 1,
+    "visibility": true,
+    "created_at": "2026-03-01T02:15:00Z",
+    "version": 1
+  }
+}
+```
+
+### Error Responses
+
+#### 400 Bad Request
+
+Returned when the ID parameter is invalid.
+
+```json
+{
+  "error": "invalid id parameter"
+}
+```
+
+#### 404 Not Found
+
+Returned when the evidence record does not exist.
+
+```json
+{
+  "error": "the requested resource could not be found"
+}
+```
+
+#### 422 Unprocessable Entity
+
+Returned when validation fails.
+
+```json
+{
+  "error": {
+    "source_url": "must be provided",
+    "file_size_bytes": "must be between 1 byte and 5 MB"
+  }
+}
+```
+
+#### 500 Internal Server Error
+
+Returned when the server encounters an unexpected error.
+
+```json
+{
+  "error": "the server encountered a problem and could not process your request"
+}
+```

@@ -1,0 +1,124 @@
+---
+title: 'Healthcheck'
+description: 'Verify API availability and system status'
+---
+
+## GET /v1/healthcheck
+
+Returns the current health status of the Ghost Planet API. Use this endpoint to verify that the API is running and accessible.
+
+### Response
+
+<ResponseField name="status" type="string">
+  Overall API status. Returns "available" when the service is operational.
+</ResponseField>
+
+<ResponseField name="system_info" type="object">
+  Detailed system information
+  
+  <Expandable title="System Info Object">
+    <ResponseField name="status" type="string">
+      Service availability status
+    </ResponseField>
+    
+    <ResponseField name="environment" type="string">
+      Current environment (development, staging, production)
+    </ResponseField>
+    
+    <ResponseField name="version" type="string">
+      API version number
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl http://localhost:4000/v1/healthcheck
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:4000/v1/healthcheck');
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+response = requests.get('http://localhost:4000/v1/healthcheck')
+data = response.json()
+print(data)
+```
+
+```go Go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "net/http"
+)
+
+func main() {
+    resp, err := http.Get("http://localhost:4000/v1/healthcheck")
+    if err != nil {
+        panic(err)
+    }
+    defer resp.Body.Close()
+    
+    var result map[string]interface{}
+    json.NewDecoder(resp.Body).Decode(&result)
+    fmt.Println(result)
+}
+```
+
+</CodeGroup>
+
+### Example Response
+
+```json
+{
+  "status": "available",
+  "system_info": {
+    "status": "available",
+    "environment": "development",
+    "version": "1.0.0"
+  }
+}
+```
+
+### Response Codes
+
+<ResponseField name="200" type="OK">
+  The API is healthy and operational
+</ResponseField>
+
+<ResponseField name="500" type="Internal Server Error">
+  The API encountered an error while processing the health check
+</ResponseField>
+
+### Usage
+
+This endpoint is typically used for:
+
+- **Monitoring**: Automated health checks by monitoring services
+- **Load Balancers**: Health probe endpoints to determine service availability
+- **CI/CD Pipelines**: Verify deployment success
+- **Development**: Quick sanity check during local development
+
+<Note>
+The healthcheck endpoint does not require authentication and can be called by any client.
+</Note>
+
+### Error Response
+
+If the server encounters an error while processing the healthcheck request:
+
+```json
+{
+  "error": "the server encountered a problem and could not process your request"
+}
+```

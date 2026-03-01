@@ -1,0 +1,366 @@
+---
+title: 'Locations'
+description: 'Manage haunted locations and investigation sites'
+---
+
+## POST /v1/locations
+
+Create a new haunted location record. Locations can be public (visible to the community) or private (visible only to the creator).
+
+### Request Body
+
+<ParamField body="name" type="string" required>
+  Name of the haunted location (max 500 bytes)
+</ParamField>
+
+<ParamField body="address" type="string" required>
+  Full street address of the location
+</ParamField>
+
+<ParamField body="state" type="string">
+  U.S. state where the location is situated
+</ParamField>
+
+<ParamField body="city" type="string">
+  City where the location is situated
+</ParamField>
+
+<ParamField body="zip" type="string">
+  ZIP code of the location
+</ParamField>
+
+<ParamField body="lore" type="string" required>
+  Historical background and paranormal lore associated with the location (max 500 bytes)
+</ParamField>
+
+<ParamField body="latitude" type="number" required>
+  Latitude coordinate (-90 to 90)
+</ParamField>
+
+<ParamField body="longitude" type="number" required>
+  Longitude coordinate (-180 to 180)
+</ParamField>
+
+<ParamField body="visibility" type="boolean" required>
+  Whether the location is public (true) or private (false)
+</ParamField>
+
+<ParamField body="popularity" type="integer">
+  Popularity rating of the location (star rating system)
+</ParamField>
+
+<ParamField body="past_investigations_user" type="array">
+  Array of investigation IDs conducted by the user at this location
+</ParamField>
+
+<ParamField body="past_investigations_community" type="array">
+  Array of investigation IDs conducted by the community at this location
+</ParamField>
+
+### Validation Rules
+
+- **name**: Required, max 500 bytes
+- **address**: Required, must be a valid address format
+- **lore**: Required, max 500 bytes
+- **latitude**: Must be a valid finite number between -90 and 90
+- **longitude**: Must be a valid finite number between -180 and 180
+
+### Response
+
+<ResponseField name="id" type="integer">
+  Unique identifier for the created location
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  Name of the location
+</ResponseField>
+
+<ResponseField name="address" type="string">
+  Full address
+</ResponseField>
+
+<ResponseField name="state" type="string">
+  State
+</ResponseField>
+
+<ResponseField name="city" type="string">
+  City
+</ResponseField>
+
+<ResponseField name="zip" type="string">
+  ZIP code
+</ResponseField>
+
+<ResponseField name="lore" type="string">
+  Historical and paranormal background
+</ResponseField>
+
+<ResponseField name="latitude" type="number">
+  Latitude coordinate
+</ResponseField>
+
+<ResponseField name="longitude" type="number">
+  Longitude coordinate
+</ResponseField>
+
+<ResponseField name="visibility" type="boolean">
+  Public or private status
+</ResponseField>
+
+<ResponseField name="popularity" type="integer">
+  Popularity rating
+</ResponseField>
+
+<ResponseField name="created_by_user_id" type="integer">
+  ID of the user who created this location
+</ResponseField>
+
+<ResponseField name="owner_user_id" type="integer">
+  ID of the location owner
+</ResponseField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST http://localhost:4000/v1/locations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "The Waverly Hills Sanatorium",
+    "address": "4400 Paralee Drive",
+    "city": "Louisville",
+    "state": "Kentucky",
+    "zip": "40272",
+    "lore": "Originally a tuberculosis hospital, Waverly Hills is known for the Room 502 haunting and shadow people sightings throughout the facility.",
+    "latitude": 38.1346,
+    "longitude": -85.9341,
+    "visibility": true,
+    "popularity": 5
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:4000/v1/locations', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name: 'The Waverly Hills Sanatorium',
+    address: '4400 Paralee Drive',
+    city: 'Louisville',
+    state: 'Kentucky',
+    zip: '40272',
+    lore: 'Originally a tuberculosis hospital, Waverly Hills is known for the Room 502 haunting and shadow people sightings throughout the facility.',
+    latitude: 38.1346,
+    longitude: -85.9341,
+    visibility: true,
+    popularity: 5
+  })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'http://localhost:4000/v1/locations',
+    json={
+        'name': 'The Waverly Hills Sanatorium',
+        'address': '4400 Paralee Drive',
+        'city': 'Louisville',
+        'state': 'Kentucky',
+        'zip': '40272',
+        'lore': 'Originally a tuberculosis hospital, Waverly Hills is known for the Room 502 haunting and shadow people sightings throughout the facility.',
+        'latitude': 38.1346,
+        'longitude': -85.9341,
+        'visibility': True,
+        'popularity': 5
+    }
+)
+
+data = response.json()
+```
+
+</CodeGroup>
+
+### Example Response
+
+```json
+{
+  "name": "The Waverly Hills Sanatorium",
+  "address": "4400 Paralee Drive",
+  "city": "Louisville",
+  "state": "Kentucky",
+  "zip": "40272",
+  "lore": "Originally a tuberculosis hospital, Waverly Hills is known for the Room 502 haunting and shadow people sightings throughout the facility.",
+  "latitude": 38.1346,
+  "longitude": -85.9341,
+  "visibility": true,
+  "popularity": 5,
+  "past_investigations_user": [],
+  "past_investigations_community": []
+}
+```
+
+---
+
+## GET /v1/locations/:id
+
+Retrieve a specific location by its ID.
+
+### Path Parameters
+
+<ParamField path="id" type="integer" required>
+  The unique identifier of the location
+</ParamField>
+
+### Response
+
+<ResponseField name="location" type="object">
+  The location record
+  
+  <Expandable title="Location Object">
+    <ResponseField name="id" type="integer">
+      Unique identifier
+    </ResponseField>
+    
+    <ResponseField name="name" type="string">
+      Location name
+    </ResponseField>
+    
+    <ResponseField name="address" type="string">
+      Full address
+    </ResponseField>
+    
+    <ResponseField name="state" type="string">
+      State
+    </ResponseField>
+    
+    <ResponseField name="city" type="string">
+      City
+    </ResponseField>
+    
+    <ResponseField name="zip" type="string">
+      ZIP code
+    </ResponseField>
+    
+    <ResponseField name="lore" type="string">
+      Historical and paranormal background
+    </ResponseField>
+    
+    <ResponseField name="latitude" type="number">
+      Latitude coordinate
+    </ResponseField>
+    
+    <ResponseField name="longitude" type="number">
+      Longitude coordinate
+    </ResponseField>
+    
+    <ResponseField name="visibility" type="boolean">
+      Public or private status
+    </ResponseField>
+    
+    <ResponseField name="popularity" type="integer">
+      Popularity rating
+    </ResponseField>
+    
+    <ResponseField name="past_investigations_user" type="array">
+      User investigations at this location
+    </ResponseField>
+    
+    <ResponseField name="past_investigations_community" type="array">
+      Community investigations at this location
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Request
+
+<CodeGroup>
+
+```bash cURL
+curl http://localhost:4000/v1/locations/42
+```
+
+```javascript JavaScript
+const response = await fetch('http://localhost:4000/v1/locations/42');
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get('http://localhost:4000/v1/locations/42')
+data = response.json()
+```
+
+</CodeGroup>
+
+### Example Response
+
+```json
+{
+  "location": {
+    "id": 42,
+    "name": "Dork Knight",
+    "address": "123 Apple lane",
+    "lore": "Ghost",
+    "latitude": 1235,
+    "longitude": -93949,
+    "past_investigations_user": [],
+    "past_investigations_community": [],
+    "popularity": 32,
+    "visibility": true
+  }
+}
+```
+
+### Error Responses
+
+#### 400 Bad Request
+
+Returned when the request body is malformed or ID parameter is invalid.
+
+```json
+{
+  "error": "invalid id parameter"
+}
+```
+
+#### 404 Not Found
+
+Returned when the location does not exist.
+
+```json
+{
+  "error": "the requested resource could not be found"
+}
+```
+
+#### 422 Unprocessable Entity
+
+Returned when validation fails on the provided data.
+
+```json
+{
+  "error": {
+    "name": "must be provided",
+    "latitude": "must be between -90 and 90",
+    "longitude": "must be between -180 and 180"
+  }
+}
+```
+
+#### 500 Internal Server Error
+
+Returned when the server encounters an unexpected error.
+
+```json
+{
+  "error": "the server encountered a problem and could not process your request"
+}
+```

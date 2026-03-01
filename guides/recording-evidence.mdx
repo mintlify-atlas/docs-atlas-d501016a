@@ -1,0 +1,269 @@
+---
+title: Recording and Submitting Evidence
+description: Learn how to capture and submit paranormal evidence using mobile and desktop tools
+---
+
+Ghost Planet allows investigators to record evidence during paranormal investigations using multiple capture methods. Evidence is organized into collections that include text notes, audio recordings, photos, and EVPs (Electronic Voice Phenomena).
+
+## Evidence Types
+
+Ghost Planet supports four types of evidence:
+
+- **Text Notes**: Written observations with subject and detailed body
+- **Audio Notes**: Voice recordings and ambient audio (max 5 MB)
+- **Photos**: Visual evidence in JPEG, PNG, or WebP format (max 5 MB)
+- **EVPs**: Audio recordings marked as potential Electronic Voice Phenomena
+
+## Recording Evidence on Mobile
+
+Mobile devices provide real-time evidence capture during active investigations.
+
+<Steps>
+  <Step title="Start an investigation">
+    Navigate to your active investigation or create a new one. The investigation must be linked to a location before you can record evidence.
+  </Step>
+
+  <Step title="Choose capture mode">
+    Select your evidence type:
+    - **Camera**: Capture photos with captions
+    - **Microphone**: Record audio notes or potential EVPs
+    - **Text**: Document observations and phenomena
+  </Step>
+
+  <Step title="Capture evidence">
+    **For Photos:**
+    1. Tap the camera icon
+    2. Frame your shot and capture
+    3. Add a caption (required, max 500 characters)
+    4. Mark visibility (public or private)
+
+    **For Audio:**
+    1. Tap the microphone icon
+    2. Record your observation or ambient audio
+    3. Stop recording when complete
+    4. Add a title for the recording
+    5. Toggle "Mark as EVP" if this is potential paranormal audio
+
+    **For Text Notes:**
+    1. Tap the text icon
+    2. Enter a subject line (required, max 500 characters)
+    3. Write detailed observations in the body (max 10,000 characters)
+    4. Select the specific location within the site
+  </Step>
+
+  <Step title="Review and submit">
+    Review your evidence collection. All evidence captured during a session is bundled together and submitted as a single evidence package linked to your investigation.
+  </Step>
+</Steps>
+
+<Note>
+  Mobile captures are automatically geotagged with your investigation's location coordinates.
+</Note>
+
+## Recording Evidence on Desktop
+
+Desktop mode supports file uploads and webcam capture for post-investigation evidence submission.
+
+<Steps>
+  <Step title="Navigate to evidence submission">
+    Open your investigation and click "Add Evidence" to begin the submission process.
+  </Step>
+
+  <Step title="Upload files">
+    **For Photos:**
+    - Click "Upload Photos" or drag files into the upload area
+    - Supported formats: JPEG, JPG, PNG, WebP
+    - Maximum file size: 5 MB per photo
+    - Add captions for each photo (required)
+
+    **For Audio:**
+    - Click "Upload Audio" or drag audio files
+    - Supported formats: MP3, WAV, M4A
+    - Maximum file size: 5 MB per file
+    - Check "Mark as EVP" for potential paranormal audio
+  </Step>
+
+  <Step title="Use webcam capture (optional)">
+    If you need to capture additional photos:
+    1. Click "Use Webcam"
+    2. Allow camera permissions in your browser
+    3. Position your subject and click "Capture"
+    4. Add a caption for the captured image
+  </Step>
+
+  <Step title="Add text observations">
+    Document your findings:
+    1. Click "Add Text Note"
+    2. Enter a subject (required, max 500 characters)
+    3. Write your detailed observations (max 10,000 characters)
+    4. Link to specific location if applicable
+  </Step>
+
+  <Step title="Set visibility and submit">
+    Choose visibility settings:
+    - **Public**: Visible to all Ghost Planet users
+    - **Private**: Only visible to you and investigation collaborators
+
+    Click "Submit Evidence" to save your evidence package.
+  </Step>
+</Steps>
+
+<Warning>
+  All evidence must be linked to both an investigation and a location. Create these first before submitting evidence.
+</Warning>
+
+## Validation Rules
+
+Your evidence submissions must meet these requirements:
+
+<Accordion title="Text Note Requirements">
+  - Subject field is required (max 500 bytes)
+  - Body field is required (max 10,000 bytes)
+  - Must be linked to a valid location ID
+
+  **Example valid text note:**
+  ```json
+  {
+    "subject": "Cold spot detected in east wing",
+    "body": "Temperature dropped 15 degrees in the hallway near room 237. EMF readings spiked to 4.5 mG. Duration approximately 3 minutes before returning to ambient temperature.",
+    "location_id": 123
+  }
+  ```
+</Accordion>
+
+<Accordion title="Audio Note Requirements">
+  - Source URL is required (max 2000 bytes)
+  - File size must be between 1 byte and 5 MB (5,242,880 bytes)
+  - Duration is automatically calculated on upload
+  - Can be marked as EVP (boolean flag)
+
+  **Example valid audio note:**
+  ```json
+  {
+    "title": "Footsteps on second floor",
+    "source_url": "https://storage.ghostplanet.com/audio/inv_123_audio_001.mp3",
+    "file_size_bytes": 2458624,
+    "duration": "00:02:15",
+    "is_evp": true
+  }
+  ```
+</Accordion>
+
+<Accordion title="Photo Requirements">
+  - Source URL is required (max 2000 bytes)
+  - File type must be: JPEG, JPG, PNG, or WebP (case-insensitive)
+  - File size must be between 1 byte and 5 MB (5,242,880 bytes)
+  - Caption is required (max 500 bytes)
+  - Thumbnail URL is generated automatically
+
+  **Example valid photo:**
+  ```json
+  {
+    "source_url": "https://storage.ghostplanet.com/photos/inv_123_photo_001.jpg",
+    "thumbnail_url": "https://storage.ghostplanet.com/photos/thumbs/inv_123_photo_001.jpg",
+    "caption": "Shadow figure captured in basement doorway",
+    "file_type": "jpeg",
+    "file_size_bytes": 3145728
+  }
+  ```
+</Accordion>
+
+## Evidence Data Structure
+
+All evidence types are bundled together in a single evidence package:
+
+```json
+{
+  "investigation_id": 42,
+  "location_id": 15,
+  "created_by_user_id": 101,
+  "visibility": true,
+  "text_notes": [
+    {
+      "subject": "Initial observations",
+      "body": "Detailed description of phenomena...",
+      "location_id": 15
+    }
+  ],
+  "audio_notes": [
+    {
+      "title": "EVP Session 1",
+      "source_url": "https://storage.example.com/audio.mp3",
+      "file_size_bytes": 2458624,
+      "is_evp": true
+    }
+  ],
+  "photos": [
+    {
+      "source_url": "https://storage.example.com/photo.jpg",
+      "caption": "Anomaly in frame",
+      "file_type": "jpeg",
+      "file_size_bytes": 3145728
+    }
+  ]
+}
+```
+
+<Tip>
+  The `created_at` timestamp and evidence `id` are automatically generated when you submit. You don't need to provide these fields.
+</Tip>
+
+## Best Practices
+
+### During Active Investigations
+
+1. **Capture immediately**: Record evidence as phenomena occur rather than relying on memory later
+2. **Add context**: Include detailed descriptions in text notes to contextualize audio and photo evidence
+3. **Mark EVPs clearly**: Use the EVP flag to distinguish potential paranormal audio from regular recordings
+4. **Check file sizes**: Stay under the 5 MB limit to ensure uploads succeed
+
+### For Desktop Uploads
+
+1. **Organize first**: Sort your evidence files before uploading
+2. **Name files descriptively**: Use clear file names like "basement-cold-spot-001.jpg"
+3. **Batch similar evidence**: Upload related photos together for easier organization
+4. **Write comprehensive notes**: Desktop mode allows for more detailed text note composition
+
+### Privacy and Sharing
+
+1. **Set appropriate visibility**: Use private mode for sensitive locations or ongoing investigations
+2. **Review before publishing**: Double-check public evidence for personal information
+3. **Coordinate with team**: Ensure all investigators agree on visibility settings
+
+## Troubleshooting
+
+<Accordion title="Upload fails with 'file too large' error">
+  Your file exceeds the 5 MB limit. Compress the file or reduce quality:
+  - For photos: Reduce resolution or use higher JPEG compression
+  - For audio: Use lower bitrate MP3 encoding (128 kbps recommended)
+</Accordion>
+
+<Accordion title="'Invalid file type' error for photos">
+  Only JPEG, JPG, PNG, and WebP formats are supported. Convert your image:
+  - Use an image editor to save as JPEG or PNG
+  - Ensure the file extension matches the actual format
+</Accordion>
+
+<Accordion title="'Subject must be provided' validation error">
+  The subject field is required for text notes and cannot be empty:
+  - Enter a brief description of the observation
+  - Keep it under 500 characters
+</Accordion>
+
+<Accordion title="Evidence submission succeeds but doesn't appear">
+  Check these common issues:
+  - Verify the evidence visibility setting matches your view filter
+  - Ensure you're viewing the correct investigation
+  - Refresh the page to load the latest data
+</Accordion>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Managing Locations" icon="map-location-dot" href="/guides/managing-locations">
+    Learn how to create and organize haunted locations
+  </Card>
+  <Card title="Creating Investigations" icon="clipboard-list" href="/guides/creating-investigations">
+    Set up and track paranormal investigations
+  </Card>
+</CardGroup>

@@ -1,0 +1,382 @@
+---
+title: 'Visibility Controls'
+description: 'Manage privacy with public and private settings for investigations, evidence, and locations'
+---
+
+## Overview
+
+Visibility controls are a core privacy feature in Ghost Planet, allowing you to control who can see your investigations, evidence, and locations. Every major feature includes a `visibility` boolean field that determines public or private status.
+
+## How Visibility Works
+
+Ghost Planet uses a simple boolean system for visibility:
+
+```go
+Visibility bool `json:"visibility"`
+```
+
+| Value | Status | Who Can Access | Description |
+|-------|--------|----------------|-------------|
+| `true` | **Public** | All Ghost Planet users | Visible to the entire community, contributes to shared knowledge |
+| `false` | **Private** | Only you (the owner) | Hidden from other users, for personal use only |
+
+<Info>
+  The visibility field appears in Investigations, Evidence, and Locations, providing consistent privacy control across all features.
+</Info>
+
+## Visibility by Feature
+
+<Tabs>
+  <Tab title="Investigations">
+    **Investigation Visibility:**
+
+    ```go
+    type Investigation struct {
+        ID               int64      `json:"id"`
+        UserID           int64      `json:"user,omitempty"`
+        LocationID       int64      `json:"location,omitempty"`
+        Phenomena        string     `json:"phenomena"`
+        CreatedAt        time.Time  `json:"created_at"`
+        Evidence         []Evidence `json:"evidence,omitempty"`
+        EmergencyContact string     `json:"emergency_contact"`
+        Visibility       bool       `json:"visibility"` // Public/Private
+    }
+    ```
+
+    **Public Investigations (`true`):**
+    - Visible in community investigation lists
+    - Linked evidence appears in location history
+    - Contributes to location popularity
+    - Helps other investigators plan research
+    - Builds your investigator profile
+
+    **Private Investigations (`false`):**
+    - Only visible to you
+    - Evidence remains hidden from community
+    - Doesn't affect location popularity
+    - Ideal for preliminary research
+    - Protects sensitive findings
+
+    <Warning>
+      Emergency contact information is always private, regardless of investigation visibility setting.
+    </Warning>
+  </Tab>
+  
+  <Tab title="Evidence">
+    **Evidence Visibility:**
+
+    ```go
+    type Evidence struct {
+        ID              int64     `json:"id"`
+        InvestigationID int64     `json:"investigation_id"`
+        LocationID      int64     `json:"location_id"`
+        CreatedByUserID int64     `json:"created_by_user_id"`
+        CreatedAt       time.Time `json:"created_at"`
+        Visibility      bool      `json:"visibility"` // Public/Private
+        Version         int32     `json:"version"`
+    }
+    ```
+
+    **Public Evidence (`true`):**
+    - Photos appear in location galleries
+    - Audio/EVPs available for community analysis
+    - Text notes contribute to location knowledge
+    - Links to public investigations
+    - Helps validate paranormal claims
+
+    **Private Evidence (`false`):**
+    - Hidden from all other users
+    - Personal documentation only
+    - Doesn't appear in location evidence
+    - Protected from public scrutiny
+    - Can be made public later
+
+    <Note>
+      Evidence visibility is independent of investigation visibility. You can have private evidence within a public investigation, or vice versa.
+    </Note>
+  </Tab>
+  
+  <Tab title="Locations">
+    **Location Visibility:**
+
+    ```go
+    type Location struct {
+        ID                          int64           `json:"id"`
+        Name                        string          `json:"name"`
+        Address                     string          `json:"address"`
+        State                       string          `json:"state"`
+        City                        string          `json:"city"`
+        Zip                         string          `json:"zip"`
+        Lore                        string          `json:"lore"`
+        Latitude                    float64         `json:"latitude"`
+        Longitude                   float64         `json:"longitude"`
+        PastInvestigationsUser      []Investigation `json:"past_investigations_user"`
+        PastInvestigationsCommunity []Investigation `json:"past_investigations_community"`
+        Popularity                  Popularity      `json:"popularity"`
+        Visibility                  bool            `json:"visibility"` // Public/Private
+        CreatedByUserID             int64           `json:"created_by_user_id"`
+        OwnerUserID                 int64           `json:"owner_user_id"`
+    }
+    ```
+
+    **Public Locations (`true`):**
+    - Appear in community location database
+    - Available for all users to investigate
+    - Accumulate community investigations
+    - Gain popularity rating
+    - Contribute to paranormal knowledge base
+
+    **Private Locations (`false`):**
+    - Only visible to owner
+    - Hidden from location search
+    - Personal research spots
+    - No community contributions
+    - Protect sensitive or proprietary locations
+
+    <Tip>
+      Private locations are ideal for locations on private property, sensitive sites, or places you want to research exclusively before sharing with the community.
+    </Tip>
+  </Tab>
+</Tabs>
+
+## Visibility Strategies
+
+Choose the right visibility approach for your research goals:
+
+<Steps>
+  <Step title="Start Private">
+    Begin with private visibility for new investigations:
+    - Conduct initial research without public scrutiny
+    - Review and organize evidence before sharing
+    - Verify findings before making claims
+    - Maintain control over sensitive information
+  </Step>
+  
+  <Step title="Review and Analyze">
+    While still private:
+    - Analyze photos for genuine anomalies
+    - Review audio for EVPs
+    - Document findings in text notes
+    - Cross-reference with location lore
+  </Step>
+  
+  <Step title="Choose to Share">
+    Decide what to make public:
+    - Share validated evidence that contributes to knowledge
+    - Keep debunked or unclear evidence private
+    - Make locations public to invite collaboration
+    - Publish investigations to build your profile
+  </Step>
+  
+  <Step title="Manage Visibility Over Time">
+    Visibility can be changed after creation:
+    - Make private evidence public after analysis
+    - Keep sensitive investigations private indefinitely
+    - Adjust location visibility based on access changes
+    - Update as your research goals evolve
+  </Step>
+</Steps>
+
+## Privacy Hierarchy
+
+Understand how visibility settings interact:
+
+<Accordion title="Investigation + Evidence Privacy">
+  **Scenario 1: Public Investigation + Public Evidence**
+  - Investigation appears in community lists
+  - Evidence visible to all users
+  - Contributes to location popularity
+  - Maximum community engagement
+
+  **Scenario 2: Public Investigation + Private Evidence**
+  - Investigation visible, but specific evidence hidden
+  - Useful for sharing investigation fact while protecting sensitive evidence
+  - Evidence summaries can still be shared in text notes
+
+  **Scenario 3: Private Investigation + Public Evidence**
+  - Investigation hidden from community
+  - Evidence appears in location galleries without investigation context
+  - Unusual configuration, not recommended
+
+  **Scenario 4: Private Investigation + Private Evidence**
+  - Complete privacy
+  - Nothing visible to other users
+  - Personal research documentation
+  - Can be selectively made public later
+
+  <Info>
+    Most users start with Scenario 4 (fully private) and move to Scenario 1 (fully public) after reviewing their findings.
+  </Info>
+</Accordion>
+
+<Accordion title="Location + Investigation Privacy">
+  **Public Location + Private Investigation:**
+  - Location visible to all users
+  - Your investigation remains hidden
+  - Other users can investigate the same location
+  - Your past investigations list doesn't include this one publicly
+
+  **Private Location + Public Investigation:**
+  - Not possible: investigations at private locations inherit privacy
+  - Private locations don't appear in public investigation lists
+  - Protects location from discovery
+
+  **Private Location + Private Investigation:**
+  - Complete privacy for exclusive research
+  - Location and investigation both hidden
+  - Ideal for sensitive or proprietary sites
+
+  <Warning>
+    Making a location public reveals its name, address, coordinates, and lore to all users. Ensure you have permission to share location information, especially for private property.
+  </Warning>
+</Accordion>
+
+## Use Cases
+
+<Tabs>
+  <Tab title="Public Research">
+    **When to use public visibility:**
+
+    ✅ Contributing to community knowledge
+    
+    ✅ Validating paranormal claims with peer review
+    
+    ✅ Building your investigator reputation
+    
+    ✅ Crowdsourcing location information
+    
+    ✅ Inviting collaboration on active cases
+    
+    ✅ Sharing well-documented evidence
+    
+    ✅ Increasing location popularity for future researchers
+
+    **Best for:**
+    - Established locations with public access
+    - Clear, validated evidence
+    - Collaborative investigations
+    - Educational purposes
+  </Tab>
+  
+  <Tab title="Private Research">
+    **When to use private visibility:**
+
+    ✅ Preliminary investigations before going public
+    
+    ✅ Sensitive or proprietary locations
+    
+    ✅ Personal documentation and learning
+    
+    ✅ Investigations on private property
+    
+    ✅ Unverified or ambiguous evidence
+    
+    ✅ Protecting location from overcrowding
+    
+    ✅ Maintaining competitive research advantage
+
+    **Best for:**
+    - New investigators building skills
+    - Private property investigations
+    - Ongoing research not ready for peer review
+    - Personal paranormal experiences
+  </Tab>
+  
+  <Tab title="Mixed Approach">
+    **Strategic visibility combinations:**
+
+    **Public Location + Private Evidence:**
+    - Share the location for others to investigate
+    - Keep your specific findings private
+    - Useful when evidence is unclear or debunked
+
+    **Private Investigation + Later Public:**
+    - Start private to review and organize
+    - Make public after analysis and validation
+    - Maintain quality control before sharing
+
+    **Public Investigation + Selective Evidence:**
+    - Share investigation details publicly
+    - Make only validated evidence public
+    - Keep unclear or personal evidence private
+
+    <Tip>
+      The most successful investigators use a mixed approach: private during active research, public after validation, with selective evidence sharing based on quality.
+    </Tip>
+  </Tab>
+</Tabs>
+
+## Changing Visibility
+
+Visibility settings can be updated after creation:
+
+```go
+func (e EvidenceModel) Update(evidence *Evidence) error
+```
+
+Update the `visibility` field through the update endpoint:
+
+```json
+{
+  "visibility": true
+}
+```
+
+<Steps>
+  <Step title="Review Content">
+    Before making something public, review:
+    - Evidence quality and authenticity
+    - Location information accuracy
+    - Personal information in notes
+    - Permissions for location sharing
+  </Step>
+  
+  <Step title="Update Visibility">
+    Change the visibility field to `true` (public) or `false` (private).
+  </Step>
+  
+  <Step title="Verify Changes">
+    Confirm:
+    - Public items appear in community searches
+    - Private items are hidden from other users
+    - Related items (investigations, evidence) reflect the change
+  </Step>
+</Steps>
+
+<Warning>
+  Making something public is easy to reverse, but once shared, others may have already viewed or referenced your content. Consider privacy carefully before publishing.
+</Warning>
+
+## Best Practices
+
+<Accordion title="Privacy Recommendations">
+  **Protect Personal Information:**
+  - Never include personal addresses in location lore
+  - Emergency contacts are always private (system-enforced)
+  - Review text notes for identifying information
+  - Use generic location names for private property
+
+  **Quality Control:**
+  - Keep evidence private until validated
+  - Make public only your best, clearest evidence
+  - Update visibility as analysis reveals quality
+  - Protect reputation with selective sharing
+
+  **Location Ethics:**
+  - Get permission before making private property public
+  - Respect "No Trespassing" signs and local laws
+  - Consider impact of popularity on location access
+  - Share responsibly to avoid location damage
+
+  **Community Contribution:**
+  - Share validated evidence to help others
+  - Make locations public to build the database
+  - Contribute to collective paranormal knowledge
+  - Credit other investigators' work in notes
+</Accordion>
+
+## Related Features
+
+- [Investigations](/features/investigations) - Investigation visibility controls
+- [Evidence Collection](/features/evidence) - Evidence privacy settings
+- [Locations](/features/locations) - Location public/private status
